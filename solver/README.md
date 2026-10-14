@@ -1,5 +1,5 @@
 # Solver
 
-Thành phần này dự kiến chứa lõi C++ dùng chung: mô hình CVRP, parser, khoảng cách `EUC_2D`, heuristic, validator và cải thiện trong tuyến. CLI sẽ là lớp mỏng dùng cùng lõi; tests kiểm chứng riêng từng quy tắc và tính hợp lệ nghiệm.
+Thành phần này chứa lõi C++ dùng chung và CLI mỏng gọi lõi đó. Scaffold hiện có thư viện tĩnh `routecraft_core`, chỉ cung cấp `routecraft::version()`, cùng CLI `routecraft` hỗ trợ help/version và smoke test CTest. Tách core khỏi CLI để API sau này có thể gọi executable mà không sao chép logic.
 
-Trạng thái: **chưa triển khai**. Chưa có source, CMake hay executable ở foundation này.
+Trạng thái: build scaffold, CLI và tests đã có. Mô hình CVRP, parser, khoảng cách `EUC_2D`, heuristic, validator, đọc `.vrp` và xuất nghiệm TXT/JSON **chưa triển khai**.

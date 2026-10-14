@@ -20,7 +20,19 @@ Solver C++ dùng chung lõi cho CLI và web. Các cấu hình nghiên cứu dự
 
 ## Trạng thái thực tế
 
-Hiện repository mới có nền tảng tài liệu và quy ước phát triển. Solver, CLI, backend, frontend, Docker, CI, benchmark và API **chưa triển khai**; chưa có hướng dẫn chạy ứng dụng.
+Repository đã có scaffold C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và file workflow GitHub Actions cục bộ. Bộ giải CVRP, parser, thuật toán, xuất nghiệm, backend, frontend, Docker, benchmark và API **chưa triển khai**. File workflow đã được tạo nhưng chưa có xác nhận CI GitHub đã chạy.
+
+## Build và kiểm tra scaffold
+
+Từ root repository, các lệnh sau cấu hình, biên dịch và chạy test đã đăng ký:
+
+```text
+cmake -S . -B build/Debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+cmake --build build/Debug
+ctest --test-dir build/Debug --output-on-failure
+```
+
+`configure` tạo cấu hình build, `build` biên dịch target, còn CTest chạy các test đã đăng ký. Dùng `Debug` cho phát triển/gỡ lỗi; `Release` là cấu hình dự kiến dùng cho thực nghiệm sau này. Với generator một cấu hình, executable nằm ở `build/<config>/bin/routecraft`; generator nhiều cấu hình thường thêm thư mục cấu hình bên dưới `bin`.
 
 ## Tài liệu
 

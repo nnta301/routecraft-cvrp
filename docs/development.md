@@ -24,4 +24,20 @@ node --version && npm --version  # khi bắt đầu frontend
 docker --version          # khi bắt đầu đóng gói
 ```
 
-Lệnh build/run chưa được cung cấp vì scaffold build và ứng dụng chưa tồn tại. Khi được thêm, chúng phải được ghi rõ là hướng dẫn đã kiểm chứng hoặc dự kiến. Tham khảo: [CMake](https://cmake.org/documentation/), [Python venv](https://docs.python.org/3/library/venv.html), [Node.js](https://nodejs.org/en/download), [Docker](https://docs.docker.com/).
+## Build và test scaffold
+
+Từ root repository, dùng build directory riêng cho mỗi cấu hình:
+
+```text
+cmake -S . -B build/Debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+cmake --build build/Debug
+ctest --test-dir build/Debug --output-on-failure
+
+cmake -S . -B build/Release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build build/Release
+ctest --test-dir build/Release --output-on-failure
+```
+
+`configure` tạo cấu hình build, `build` biên dịch, CTest chạy test đã đăng ký. `Debug` dành cho phát triển/gỡ lỗi; `Release` dự kiến phục vụ thực nghiệm sau này. Có thể kiểm tra CLI tại `build/Debug/bin/routecraft` với generator một cấu hình; generator nhiều cấu hình thêm thư mục cấu hình dưới `bin`.
+
+Môi trường cục bộ đã kiểm tra ở bước scaffold này là Windows với CMake 3.31.5 và MinGW g++; chưa khẳng định hỗ trợ mọi OS/compiler. Backend/frontend/Docker chưa được cài đặt hay kiểm thử. Tham khảo: [CMake](https://cmake.org/documentation/), [Python venv](https://docs.python.org/3/library/venv.html), [Node.js](https://nodejs.org/en/download), [Docker](https://docs.docker.com/).

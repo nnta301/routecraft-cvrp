@@ -2,7 +2,7 @@
 
 ## Sprint 1
 
-Hoàn thành khi có mô hình dữ liệu, parser `.vrp`, NN, validator độc lập, CLI xuất TXT/JSON và tests. Validator phải tự tính lại tập khách, depot, tải, khoảng cách và tổng khoảng cách; không tin trực tiếp số liệu từ solver.
+Scaffold C++ build được, CLI help/version và smoke test đã có, nhưng Sprint 1 chưa hoàn thành. Sprint hoàn thành khi có mô hình dữ liệu, parser `.vrp`, NN, validator độc lập, CLI xuất TXT/JSON và tests. Validator phải tự tính lại tập khách, depot, tải, khoảng cách và tổng khoảng cách; không tin trực tiếp số liệu từ solver.
 
 ## Tiếp theo
 

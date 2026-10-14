@@ -1,0 +1,50 @@
+if(NOT DEFINED ROUTECRAFT_EXECUTABLE OR NOT EXISTS "${ROUTECRAFT_EXECUTABLE}")
+    message(FATAL_ERROR "ROUTECRAFT_EXECUTABLE must point to the built routecraft executable")
+endif()
+
+function(require_contains value expected context)
+    string(FIND "${value}" "${expected}" position)
+    if(position EQUAL -1)
+        message(FATAL_ERROR "${context}: expected output to contain '${expected}', got '${value}'")
+    endif()
+endfunction()
+
+function(run_case name expected_result expected_stdout expected_stderr)
+    execute_process(
+        COMMAND "${ROUTECRAFT_EXECUTABLE}" ${ARGN}
+        RESULT_VARIABLE actual_result
+        OUTPUT_VARIABLE actual_stdout
+        ERROR_VARIABLE actual_stderr
+    )
+
+    if(NOT actual_result EQUAL expected_result)
+        message(FATAL_ERROR "${name}: expected exit code ${expected_result}, got ${actual_result}")
+    endif()
+    if(expected_stdout STREQUAL "empty" AND NOT actual_stdout STREQUAL "")
+        message(FATAL_ERROR "${name}: stdout must be empty, got '${actual_stdout}'")
+    endif()
+    if(expected_stderr STREQUAL "empty" AND NOT actual_stderr STREQUAL "")
+        message(FATAL_ERROR "${name}: stderr must be empty, got '${actual_stderr}'")
+    endif()
+    if(expected_stdout STREQUAL "usage")
+        require_contains("${actual_stdout}" "Usage:" "${name} stdout")
+    endif()
+    if(expected_stdout STREQUAL "version")
+        require_contains("${actual_stdout}" "routecraft" "${name} stdout")
+        require_contains("${actual_stdout}" "0.1.0" "${name} stdout")
+    endif()
+    if(expected_stderr STREQUAL "usage")
+        require_contains("${actual_stderr}" "Usage:" "${name} stderr")
+    endif()
+    if(expected_stderr STREQUAL "error")
+        require_contains("${actual_stderr}" "Error:" "${name} stderr")
+    endif()
+endfunction()
+
+run_case(help 0 usage empty --help)
+run_case(short_help 0 usage empty -h)
+run_case(version 0 version empty --version)
+run_case(no_arguments 2 empty usage)
+run_case(unknown_option 2 empty error --unknown)
+run_case(extra_argument 2 empty error --help unexpected)
+run_case(unimplemented_solve 2 empty error solve)
