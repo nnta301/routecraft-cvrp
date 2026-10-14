@@ -1,0 +1,31 @@
+# C++ / CMake build artifacts
+/build/
+/cmake-build-*/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+dist/
+
+# Local secrets (keep .env.example trackable)
+.env
+.env.*
+!.env.example
+
+# Ephemeral runtime output; curated data and experiment results remain trackable
+/tmp/
+/tmp-*/
+/runtime-output/
+/data/generated/

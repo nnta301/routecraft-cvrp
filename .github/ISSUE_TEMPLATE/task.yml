@@ -1,0 +1,32 @@
+name: Task
+description: Đề xuất một công việc có phạm vi và tiêu chí nghiệm thu rõ ràng.
+title: "task: "
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Mục tiêu
+      description: Kết quả cần đạt và giá trị mang lại.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Phạm vi
+      description: Những thay đổi được thực hiện và những phần loại trừ.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Các điều kiện có thể kiểm tra để xem task hoàn thành.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Task, quyết định hoặc tài nguyên cần có; ghi "Không có" nếu không có.
+    validations:
+      required: true
