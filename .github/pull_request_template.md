@@ -1,3 +1,14 @@
+## Issue liên quan
+
+<!-- Dùng Closes khi PR hoàn thành toàn bộ issue; dùng Refs nếu issue còn phần manual/configuration chưa xong. -->
+Refs #<issue-number>
+
+## Đối chiếu acceptance criteria
+
+- [ ] AC 1: …
+- [ ] AC 2: …
+- [ ] AC 3: …
+
 ## Thay đổi chính
 
 <!-- Mô tả ngắn các thay đổi. -->
