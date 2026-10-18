@@ -1,10 +1,15 @@
 name: Build and test
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -22,15 +27,17 @@ jobs:
         uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
+
       - name: Show tool versions
         run: |
           cmake --version
           c++ --version
+
       - name: Configure
         run: cmake -S . -B build/${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON
+
       - name: Build
         run: cmake --build build/${{ matrix.build_type }} --config ${{ matrix.build_type }}
-      - name: Test
-        run: ctest --test-dir build/${{ matrix.build_type }} --build-config ${{ matrix.build_type }} --no-tests=error --output-on-failure -N
+
       - name: Run tests
         run: ctest --test-dir build/${{ matrix.build_type }} --build-config ${{ matrix.build_type }} --no-tests=error --output-on-failure
