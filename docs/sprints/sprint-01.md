@@ -40,7 +40,7 @@ Các Issue đã cam kết cho Sprint 1:
 - Có scaffold CMake C++17 với static library `routecraft_core` và executable `routecraft` liên kết với core.
 - CLI hỗ trợ `--help`, `-h`, `--version`; lệnh `solve` được từ chối vì chưa triển khai.
 - Có smoke test CTest cho các hành vi CLI tối thiểu.
-- Đã có file cấu hình GitHub Actions build/test cục bộ. Chưa có xác nhận workflow đã chạy thành công trên GitHub.
+- Workflow GitHub Actions `Build and test` đã chạy thành công trên GitHub cho cả cấu hình `Debug` và `Release`, chỉ xác minh scaffold build được và các CTest hiện có pass.
 
 ## Not completed / carried over
 
@@ -48,7 +48,7 @@ Toàn bộ mục tiêu baseline còn lại chưa hoàn thành: mô hình CVRP, p
 
 ## Evidence
 
-Evidence hiện có trong repository: `CMakeLists.txt`, `solver/CMakeLists.txt`, `solver/cli/main.cpp` và `solver/tests/`. Kết quả chạy CI trên GitHub chưa được xác nhận. Evidence cho solver CVRP sẽ được bổ sung khi từng phần được triển khai và kiểm chứng.
+Evidence hiện có trong repository: `CMakeLists.txt`, `solver/CMakeLists.txt`, `solver/cli/main.cpp` và `solver/tests/`. [GitHub Actions run 38596237542](https://github.com/nnta301/routecraft-cvrp/actions/runs/38596237542) đã chạy thành công cho cả `Debug` và `Release`, chỉ xác minh scaffold build được và các CTest hiện có pass. Evidence cho solver CVRP sẽ được bổ sung khi từng phần được triển khai và kiểm chứng.
 
 ## Retrospective
 
