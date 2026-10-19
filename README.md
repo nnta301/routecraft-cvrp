@@ -20,13 +20,17 @@ Solver C++ dùng chung lõi cho CLI và web. Các cấu hình nghiên cứu dự
 
 ## Trạng thái thực tế
 
-Repository đã có scaffold C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions. Bộ giải CVRP, parser, thuật toán, xuất nghiệm, backend, frontend, Docker, benchmark và API **chưa triển khai**. GitHub Actions workflow `Build and test` đã chạy thành công trên GitHub cho cả cấu hình `Debug` và `Release`, xác minh scaffold hiện tại build được và các CTest đã đăng ký đều pass.
+Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions.
+
+Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp`, Nearest Neighbor, validator hoàn chỉnh, lệnh `solve`, xuất nghiệm, backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
+
+Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. Kết quả kiểm tra cho từng thay đổi được ghi tại PR tương ứng.
 
 ## Trạng thái hiện tại
 
 Sprint hiện tại: [Sprint 1 — CVRP Baseline CLI](docs/sprints/sprint-01.md)
 
-## Build và kiểm tra scaffold
+## Build và kiểm tra
 
 Từ root repository, các lệnh sau cấu hình, biên dịch và chạy test đã đăng ký:
 

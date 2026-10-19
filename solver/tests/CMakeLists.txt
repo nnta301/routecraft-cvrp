@@ -4,3 +4,14 @@ add_test(
         "-DROUTECRAFT_EXECUTABLE=$<TARGET_FILE:routecraft>"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_smoke.cmake"
 )
+
+add_executable(routecraft_core_tests
+    cvrp_core_tests.cpp
+)
+
+target_link_libraries(routecraft_core_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_core_tests
+    COMMAND routecraft_core_tests
+)
