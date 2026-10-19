@@ -1,5 +1,6 @@
 add_library(routecraft_core STATIC
     src/distance.cpp
+    src/vrp_parser.cpp
     src/version.cpp
 )
 
