@@ -24,3 +24,4 @@ data/
   toy/          # instance nhỏ tự tạo
   benchmarks/   # benchmark có nguồn gốc
 experiments/    # cấu hình, kết quả được chọn để lưu và phân tích
+```
