@@ -22,7 +22,7 @@ Solver C++ dùng chung lõi cho CLI và web. Các cấu hình nghiên cứu dự
 
 Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions.
 
-Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp`, Nearest Neighbor, validator hoàn chỉnh, lệnh `solve`, xuất nghiệm, backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
+Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp` hiện hỗ trợ một depot, `TYPE: CVRP` và `EDGE_WEIGHT_TYPE: EUC_2D`; parser kiểm tra dữ liệu đầu vào, chuẩn hóa depot về chỉ số nội bộ `0` và giữ ID nguồn. Nearest Neighbor, validator hoàn chỉnh, lệnh `solve`, xuất nghiệm, backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
 
 Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. Kết quả kiểm tra cho từng thay đổi được ghi tại PR tương ứng.
 
