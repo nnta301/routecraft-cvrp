@@ -42,6 +42,8 @@ struct Metadata {
 using CoordinateMap = std::unordered_map<std::string, Coordinates>;
 using DemandMap = std::unordered_map<std::string, Demand>;
 
+constexpr std::size_t max_supported_node_count = 100;
+
 [[noreturn]] void fail(const std::string& message) {
     throw ParseError("Dữ liệu CVRPLIB không hợp lệ: " + message);
 }
@@ -98,6 +100,10 @@ std::size_t parse_dimension(const std::string& text, std::size_t line_number) {
     if (static_cast<std::uintmax_t>(value) >
         static_cast<std::uintmax_t>(std::numeric_limits<std::size_t>::max())) {
         fail(line_number, "DIMENSION vượt quá giới hạn hỗ trợ");
+    }
+
+    if (static_cast<std::uintmax_t>(value) > max_supported_node_count) {
+        fail(line_number, "parser chỉ hỗ trợ tối đa 99 khách hàng (DIMENSION tối đa 100)");
     }
 
     return static_cast<std::size_t>(value);
@@ -301,6 +307,7 @@ Instance parse_cvrplib(std::istream& input) {
     bool saw_demand_section = false;
     bool saw_depot_section = false;
     bool depot_section_terminated = false;
+    bool saw_eof = false;
 
     std::string line;
     std::size_t line_number = 0;
@@ -320,6 +327,7 @@ Instance parse_cvrplib(std::istream& input) {
         const std::string uppercase_line = uppercase(trimmed_line);
 
         if (uppercase_line == "EOF") {
+            saw_eof = true;
             section = Section::finished;
             continue;
         }
@@ -395,6 +403,14 @@ Instance parse_cvrplib(std::istream& input) {
         if (depot_ids.size() > 1) {
             fail(line_number, "chỉ hỗ trợ đúng một depot");
         }
+    }
+
+    if (input.bad() || !input.eof()) {
+        fail("lỗi khi đọc dữ liệu đầu vào");
+    }
+
+    if (!saw_eof) {
+        fail("thiếu marker EOF");
     }
 
     require_required_headers(metadata);
