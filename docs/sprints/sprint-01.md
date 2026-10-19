@@ -43,16 +43,19 @@ Các Issue đã cam kết cho Sprint 1:
 - CLI hỗ trợ `--help`, `-h`, `--version`; lệnh `solve` được từ chối vì chưa triển khai.
 - Có smoke test CTest cho các hành vi CLI tối thiểu.
 - Workflow GitHub Actions `Build and test` đã chạy thành công trên GitHub cho cả cấu hình `Debug` và `Release`, chỉ xác minh scaffold build được và các CTest hiện có pass.
+- Hoàn thành [#2 — Parse supported CVRPLIB .vrp instances](https://github.com/nnta301/routecraft-cvrp/issues/2): parser hỗ trợ tập CVRPLIB của Sprint 1, kiểm tra dữ liệu đầu vào, chuẩn hóa depot nội bộ `0` và giữ ID nguồn.
 
 ## Not completed / carried over
 
-Các hạng mục baseline còn lại chưa hoàn thành: parser `.vrp`, Nearest Neighbor, validator độc lập, lệnh `solve`, xuất TXT/JSON, dữ liệu toy và các kiểm thử tích hợp tương ứng.
+Các hạng mục baseline còn lại chưa hoàn thành: Nearest Neighbor, validator độc lập, lệnh `solve`, xuất TXT/JSON, dữ liệu toy và các kiểm thử tích hợp tương ứng.
 
 ## Evidence
 
 Evidence hiện có trong repository: `CMakeLists.txt`, `solver/CMakeLists.txt`, `solver/cli/main.cpp` và `solver/tests/`. [GitHub Actions run 38596237542](https://github.com/nnta301/routecraft-cvrp/actions/runs/38596237542) đã chạy thành công cho scaffold ban đầu ở cả `Debug` và `Release`.
 
 Evidence cho Issue #1 gồm `solver/include/routecraft/cvrp.hpp`, `solver/include/routecraft/distance.hpp`, `solver/src/distance.cpp`, `solver/tests/cvrp_core_tests.cpp` và các kiểm tra Debug/Release của PR liên kết Issue #1.
+
+Evidence cho Issue #2 gồm `solver/include/routecraft/vrp_parser.hpp`, `solver/src/vrp_parser.cpp`, `solver/tests/vrp_parser_tests.cpp` và kết quả kiểm tra Debug/Release của PR liên kết Issue #2.
 
 ## Retrospective
 
