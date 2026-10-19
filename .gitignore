@@ -29,3 +29,6 @@ dist/
 /tmp-*/
 /runtime-output/
 /data/generated/
+
+# Local tool cache
+/.cache/
