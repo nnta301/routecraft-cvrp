@@ -143,6 +143,14 @@ void test_rejects_invalid_inputs() {
             replace_once(valid, "DIMENSION : 3", "DIMENSION : 4"),
         },
         {
+            "thiếu marker EOF",
+            replace_once(valid, "EOF\n", ""),
+        },
+        {
+            "dimension vượt giới hạn số khách",
+            replace_once(valid, "DIMENSION : 3", "DIMENSION : 101"),
+        },
+        {
             "TYPE không hỗ trợ",
             replace_once(valid, "TYPE : CVRP", "TYPE : TSP"),
         },
@@ -156,6 +164,19 @@ void test_rejects_invalid_inputs() {
     for (const auto& [case_name, input] : invalid_cases) {
         require_parse_error(input, case_name);
     }
+}
+
+void test_rejects_stream_read_error() {
+    std::istringstream input(valid_instance_text());
+    input.setstate(std::ios::badbit);
+
+    try {
+        static_cast<void>(routecraft::parse_cvrplib(input));
+    } catch (const ParseError&) {
+        return;
+    }
+
+    throw std::runtime_error("Parser phải từ chối stream gặp lỗi đọc");
 }
 
 struct TestCase {
@@ -174,6 +195,10 @@ int main() {
         {
             "tu_choi_du_lieu_khong_hop_le",
             test_rejects_invalid_inputs,
+        },
+        {
+            "tu_choi_loi_doc_stream",
+            test_rejects_stream_read_error,
         },
     };
 
