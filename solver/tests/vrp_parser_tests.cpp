@@ -40,6 +40,31 @@ EOF
 )";
 }
 
+std::string oversized_dimension_instance_text() {
+    std::ostringstream output;
+    output << "NAME : oversized-dimension\n"
+           << "TYPE : CVRP\n"
+           << "DIMENSION : 101\n"
+           << "CAPACITY : 100\n"
+           << "EDGE_WEIGHT_TYPE : EUC_2D\n"
+           << "NODE_COORD_SECTION\n";
+
+    for (int id = 1; id <= 101; ++id) {
+        output << id << ' ' << id << " 0\n";
+    }
+
+    output << "DEMAND_SECTION\n";
+    for (int id = 1; id <= 101; ++id) {
+        output << id << ' ' << (id == 1 ? 0 : 1) << '\n';
+    }
+
+    output << "DEPOT_SECTION\n"
+           << "1\n"
+           << "-1\n"
+           << "EOF\n";
+    return output.str();
+}
+
 Instance parse_text(const std::string& text) {
     std::istringstream input(text);
     return routecraft::parse_cvrplib(input);
@@ -128,7 +153,8 @@ void test_rejects_invalid_inputs() {
         },
         {
             "trùng tọa độ",
-            replace_once(valid, "99 6 4\nDEMAND_SECTION", "7 6 4\nDEMAND_SECTION"),
+            replace_once(valid, "99 6 4\nDEMAND_SECTION",
+                         "99 6 4\n7 6 4\nDEMAND_SECTION"),
         },
         {
             "thiếu demand",
@@ -136,7 +162,8 @@ void test_rejects_invalid_inputs() {
         },
         {
             "trùng demand",
-            replace_once(valid, "99 4\nDEPOT_SECTION", "7 4\nDEPOT_SECTION"),
+            replace_once(valid, "99 4\nDEPOT_SECTION",
+                         "99 4\n7 4\nDEPOT_SECTION"),
         },
         {
             "dimension không khớp",
@@ -148,7 +175,7 @@ void test_rejects_invalid_inputs() {
         },
         {
             "dimension vượt giới hạn số khách",
-            replace_once(valid, "DIMENSION : 3", "DIMENSION : 101"),
+            oversized_dimension_instance_text(),
         },
         {
             "TYPE không hỗ trợ",
