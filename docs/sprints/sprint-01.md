@@ -1,14 +1,14 @@
 # Sprint 1 — CVRP Baseline CLI
 
-## Status
+## Trạng thái
 
-In progress.
+Đang thực hiện.
 
-## Goal
+## Mục tiêu
 
 Hoàn thiện baseline CVRP có thể chạy độc lập từ CLI, đọc instance `.vrp`, tạo nghiệm Nearest Neighbor hợp lệ, kiểm tra độc lập và xuất kết quả TXT/JSON.
 
-## Scope
+## Phạm vi
 
 - Mô hình dữ liệu CVRP và quy ước depot nội bộ là `0`.
 - Khoảng cách `EUC_2D`, làm tròn từng cạnh.
@@ -18,13 +18,13 @@ Hoàn thiện baseline CVRP có thể chạy độc lập từ CLI, đọc insta
 - CLI `solve`, xuất TXT và JSON.
 - Dữ liệu toy cùng kiểm thử tự động.
 
-## Out of scope
+## Ngoài phạm vi
 
 - Clarke–Wright, 2-opt, relocate.
 - FastAPI, React, Docker, deploy.
 - ML, ACO, GA, Tabu Search và các biến thể VRP ngoài phạm vi.
 
-## Planned issues
+## Các issue đã cam kết
 
 Các Issue đã cam kết cho Sprint 1:
 
@@ -35,36 +35,40 @@ Các Issue đã cam kết cho Sprint 1:
 - [#5 — Add solve command and TXT/JSON result export](https://github.com/nnta301/routecraft-cvrp/issues/5)
 - [#6 — Add Sprint 1 toy fixtures and end-to-end regression coverage](https://github.com/nnta301/routecraft-cvrp/issues/6)
 
-## Completed
+## Đã hoàn thành
 
 - Có scaffold CMake C++17 với static library `routecraft_core` và executable `routecraft` liên kết với core.
 - Hoàn thành [#1 — CVRP domain model and EUC_2D distance utilities](https://github.com/nnta301/routecraft-cvrp/issues/1): mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, tiện ích `EUC_2D`, tính tải/độ dài tuyến và tổng độ dài nghiệm.
 - Có unit test CTest cho làm tròn từng cạnh, cạnh quay về depot, tải tuyến, tổng độ dài nghiệm và ánh xạ ID gốc.
 - CLI hỗ trợ `--help`, `-h`, `--version`; lệnh `solve` được từ chối vì chưa triển khai.
 - Có smoke test CTest cho các hành vi CLI tối thiểu.
-- Workflow GitHub Actions `Build and test` đã chạy thành công trên GitHub cho cả cấu hình `Debug` và `Release`, chỉ xác minh scaffold build được và các CTest hiện có pass.
+- Workflow GitHub Actions `Build and test` kiểm tra build và toàn bộ CTest đã đăng ký trên cả cấu hình `Debug` và `Release`.
 - Hoàn thành [#2 — Parse supported CVRPLIB .vrp instances](https://github.com/nnta301/routecraft-cvrp/issues/2): parser hỗ trợ tập CVRPLIB của Sprint 1, kiểm tra dữ liệu đầu vào, chuẩn hóa depot nội bộ `0` và giữ ID nguồn.
+- Hoàn thành [#3 — Implement deterministic capacity-aware Nearest Neighbor](https://github.com/nnta301/routecraft-cvrp/issues/3): bổ sung heuristic Nearest Neighbor có xét tải trọng trong lõi solver; dùng chỉ số nội bộ, đóng mỗi tuyến tại depot `0`, phá hòa theo `internal_index` và đo riêng thời gian dựng nghiệm.
+- Có unit test CTest cho một khách, tuyến vừa đầy tải, nhiều tuyến, phục vụ mỗi khách đúng một lần và trường hợp đồng khoảng cách.
 
-## Not completed / carried over
+## Chưa hoàn thành / chuyển tiếp
 
-Các hạng mục baseline còn lại chưa hoàn thành: Nearest Neighbor, validator độc lập, lệnh `solve`, xuất TXT/JSON, dữ liệu toy và các kiểm thử tích hợp tương ứng.
+Các hạng mục baseline còn lại chưa hoàn thành: validator độc lập, lệnh `solve`, xuất TXT/JSON, dữ liệu toy và các kiểm thử tích hợp tương ứng.
 
-## Evidence
+## Bằng chứng
 
-Evidence hiện có trong repository: `CMakeLists.txt`, `solver/CMakeLists.txt`, `solver/cli/main.cpp` và `solver/tests/`. [GitHub Actions run 38596237542](https://github.com/nnta301/routecraft-cvrp/actions/runs/38596237542) đã chạy thành công cho scaffold ban đầu ở cả `Debug` và `Release`.
+Bằng chứng hiện có trong repository: `CMakeLists.txt`, `solver/CMakeLists.txt`, `solver/cli/main.cpp` và `solver/tests/`. [GitHub Actions run 38596237542](https://github.com/nnta301/routecraft-cvrp/actions/runs/38596237542) đã chạy thành công cho scaffold ban đầu ở cả `Debug` và `Release`.
 
-Evidence cho Issue #1 gồm `solver/include/routecraft/cvrp.hpp`, `solver/include/routecraft/distance.hpp`, `solver/src/distance.cpp`, `solver/tests/cvrp_core_tests.cpp` và các kiểm tra Debug/Release của PR liên kết Issue #1.
+Bằng chứng cho Issue #1 gồm `solver/include/routecraft/cvrp.hpp`, `solver/include/routecraft/distance.hpp`, `solver/src/distance.cpp`, `solver/tests/cvrp_core_tests.cpp` và các kiểm tra Debug/Release của PR liên kết Issue #1.
 
-Evidence cho Issue #2 gồm `solver/include/routecraft/vrp_parser.hpp`, `solver/src/vrp_parser.cpp`, `solver/tests/vrp_parser_tests.cpp` và kết quả kiểm tra Debug/Release của PR liên kết Issue #2.
+Bằng chứng cho Issue #2 gồm `solver/include/routecraft/vrp_parser.hpp`, `solver/src/vrp_parser.cpp`, `solver/tests/vrp_parser_tests.cpp` và kết quả kiểm tra Debug/Release của PR liên kết Issue #2.
 
-## Retrospective
+Bằng chứng cho Issue #3 gồm `solver/include/routecraft/nearest_neighbor.hpp`, `solver/src/nearest_neighbor.cpp`, `solver/tests/nearest_neighbor_tests.cpp` và kết quả kiểm tra Debug/Release của PR liên kết Issue #3.
+
+## Tổng kết
 
 Sprint đang diễn ra; retrospective sẽ được hoàn thiện khi Sprint kết thúc.
 
-### What went well
+### Điều làm tốt
 
 Scaffold tách core/CLI và smoke test đã tạo nền tảng tối thiểu để triển khai baseline.
 
-### What was blocked or difficult
+### Trở ngại hoặc khó khăn
 
 Chưa có thông tin retrospective hoàn chỉnh khi các hạng mục baseline chưa được triển khai.

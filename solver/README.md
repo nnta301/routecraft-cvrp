@@ -17,4 +17,12 @@ Parser được khai báo tại `routecraft/vrp_parser.hpp`. Parser hỗ trợ t
 
 Parser kiểm tra dữ liệu không hợp lệ, bao gồm depot không hợp lệ, capacity không dương, demand âm hoặc vượt capacity, dữ liệu tọa độ/demand thiếu hoặc trùng, `DIMENSION` không khớp và loại bài toán/khoảng cách chưa hỗ trợ.
 
-Trạng thái: mô hình dữ liệu CVRP, tiện ích khoảng cách, parser `.vrp` và unit test đã có. Nearest Neighbor, validator độc lập, đọc instance từ CLI, xuất nghiệm TXT/JSON và API vẫn chưa triển khai.
+## Nearest Neighbor
+
+Heuristic được khai báo tại `routecraft/nearest_neighbor.hpp`. `solve_nearest_neighbor` nhận `Instance` đã hợp lệ và trả về nghiệm cùng thời gian dựng nghiệm theo mili-giây.
+
+Heuristic tạo từng tuyến từ depot nội bộ `0`, luôn chọn khách chưa phục vụ gần nhất còn vừa tải. Khi nhiều khách có cùng khoảng cách, thuật toán chọn khách có `internal_index` nhỏ hơn để cùng input luôn tạo cùng nghiệm. Mỗi tuyến được đóng tại depot `0`; số tuyến là kết quả của thuật toán, không được ấn định trước.
+
+Heuristic không thay thế validator độc lập và không thực hiện Clarke–Wright, 2-opt hoặc relocate.
+
+Trạng thái: mô hình dữ liệu CVRP, tiện ích khoảng cách, parser `.vrp`, Nearest Neighbor và các unit test tương ứng đã có. Validator độc lập, đọc instance từ CLI, xuất nghiệm TXT/JSON và API vẫn chưa triển khai.

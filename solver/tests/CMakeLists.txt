@@ -26,3 +26,14 @@ add_test(
     NAME routecraft_parser_tests
     COMMAND routecraft_parser_tests
 )
+
+add_executable(routecraft_nearest_neighbor_tests
+    nearest_neighbor_tests.cpp
+)
+
+target_link_libraries(routecraft_nearest_neighbor_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_nearest_neighbor_tests
+    COMMAND routecraft_nearest_neighbor_tests
+)

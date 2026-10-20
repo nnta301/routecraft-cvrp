@@ -1,7 +1,8 @@
 add_library(routecraft_core STATIC
     src/distance.cpp
-    src/vrp_parser.cpp
+    src/nearest_neighbor.cpp
     src/version.cpp
+    src/vrp_parser.cpp
 )
 
 target_include_directories(routecraft_core
