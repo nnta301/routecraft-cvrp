@@ -19,7 +19,7 @@ Demand route_load(const Instance& instance, const Route& route) {
             continue;
         }
 
-        load += instance.nodes.at(node_index).demand;
+        load += node_by_internal_index(instance, node_index).demand;
     }
 
     return load;
@@ -33,8 +33,10 @@ Distance route_distance(const Instance& instance, const Route& route) {
     Distance total_distance = 0;
 
     for (std::size_t position = 1; position < route.stops.size(); ++position) {
-        const Node& previous = instance.nodes.at(route.stops[position - 1]);
-        const Node& current = instance.nodes.at(route.stops[position]);
+        const Node& previous =
+            node_by_internal_index(instance, route.stops[position - 1]);
+        const Node& current =
+            node_by_internal_index(instance, route.stops[position]);
 
         total_distance += euclidean_distance(previous, current);
     }

@@ -22,20 +22,21 @@ std::optional<Candidate> find_nearest_feasible_customer(
     NodeIndex current_node,
     Demand current_load) {
     std::optional<Candidate> best_candidate;
+    const Node& current = node_by_internal_index(instance, current_node);
 
     for (NodeIndex candidate_index = 1; candidate_index < instance.nodes.size(); ++candidate_index) {
         if (served.at(candidate_index)) {
             continue;
         }
 
-        const Node& candidate = instance.nodes.at(candidate_index);
+        const Node& candidate = node_by_internal_index(instance, candidate_index);
 
         if (candidate.demand > instance.capacity - current_load) {
             continue;
         }
 
         const Distance candidate_distance =
-            euclidean_distance(instance.nodes.at(current_node), candidate);
+            euclidean_distance(current, candidate);
 
         if (!best_candidate.has_value() ||
             candidate_distance < best_candidate->distance ||
@@ -89,7 +90,8 @@ NearestNeighborResult solve_nearest_neighbor(const Instance& instance) {
 
             route.stops.push_back(next_customer->node_index);
             served.at(next_customer->node_index) = true;
-            current_load += instance.nodes.at(next_customer->node_index).demand;
+            current_load +=
+                node_by_internal_index(instance, next_customer->node_index).demand;
             current_node = next_customer->node_index;
             --remaining_customers;
         }
