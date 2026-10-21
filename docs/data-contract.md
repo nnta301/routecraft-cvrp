@@ -6,6 +6,8 @@
 
 JSON dự kiến gồm `instance` (tên/định danh), `capacity` (số nguyên dương), `nodes` (mảng node) và ánh xạ ID. Mỗi node có `internal_index` (số nguyên), `original_id` (ID nguồn, chuỗi hoặc số), `x`, `y` (số thực, đơn vị tọa độ), `demand` (số nguyên không âm) và `is_depot` (boolean). Depot luôn có `internal_index: 0`; chỉ có một depot. Các node còn lại được lập chỉ mục liên tiếp nội bộ.
 
+Thứ tự phần tử trong `nodes` không quyết định định danh node. Mọi `NodeIndex` trong route phải được phân giải qua trường `Node::internal_index`; các chỉ số nội bộ phải duy nhất và liên tiếp từ `0` đến `DIMENSION - 1`.
+
 Parser `.vrp` dự kiến chuyển dữ liệu nguồn sang quy ước này và giữ ánh xạ sang `original_id`. `DIMENSION` bao gồm depot. Input lỗi khi thiếu/nhân bản chỉ số, thiếu depot, capacity không dương, nhu cầu âm, hoặc có khách có `demand > capacity`.
 
 ## Output

@@ -202,6 +202,78 @@ void test_equal_distances_use_lower_internal_index() {
     require_valid_solver_output(instance, first_result.solution);
 }
 
+void test_internal_index_lookup_rejects_missing_and_duplicate_nodes() {
+    const Instance instance{
+        "lookup",
+        2,
+        {
+            make_node(2, "customer-2", 2.0, 0.0, 1),
+            make_node(0, "depot", 0.0, 0.0, 0, true),
+            make_node(1, "customer-1", 1.0, 0.0, 1),
+        },
+    };
+
+    require(
+        routecraft::node_by_internal_index(instance, 1).original_id == "customer-1",
+        "Tra cứu phải trả về node theo internal_index, không theo vị trí vector");
+
+    bool missing_id_rejected = false;
+    try {
+        static_cast<void>(routecraft::node_by_internal_index(instance, 3));
+    } catch (const std::out_of_range&) {
+        missing_id_rejected = true;
+    }
+    require(missing_id_rejected, "Phải báo lỗi khi thiếu internal_index");
+
+    Instance duplicate_instance = instance;
+    duplicate_instance.nodes.push_back(make_node(1, "duplicate", 4.0, 0.0, 1));
+    bool duplicate_id_rejected = false;
+    try {
+        static_cast<void>(routecraft::node_by_internal_index(duplicate_instance, 1));
+    } catch (const std::invalid_argument&) {
+        duplicate_id_rejected = true;
+    }
+    require(duplicate_id_rejected, "Phải báo lỗi khi trùng internal_index");
+}
+
+void test_reordered_nodes_are_resolved_by_internal_index() {
+    const Instance instance{
+        "reordered-nodes",
+        2,
+        {
+            make_node(2, "customer-2", 2.0, 0.0, 1),
+            make_node(0, "depot", 0.0, 0.0, 0, true),
+            make_node(1, "customer-1", 1.0, 0.0, 1),
+            make_node(3, "customer-3", 3.0, 0.0, 1),
+        },
+    };
+
+    const NearestNeighborResult result = routecraft::solve_nearest_neighbor(instance);
+
+    require(result.solution.routes.size() == 2, "Phải tạo hai tuyến khi capacity là 2");
+    require_stops_equal(
+        result.solution.routes.at(0),
+        {0, 1, 2, 0},
+        "NN phải dùng internal_index khi chọn hai khách đầu tiên");
+    require_stops_equal(
+        result.solution.routes.at(1),
+        {0, 3, 0},
+        "Khách còn lại phải nằm trong tuyến thứ hai");
+    require(
+        routecraft::route_load(instance, result.solution.routes.at(0)) == 2,
+        "Tải tuyến đầu phải được tính theo internal_index");
+    require(
+        routecraft::route_distance(instance, result.solution.routes.at(0)) == 4,
+        "Khoảng cách tuyến đầu phải được tính theo internal_index");
+    require(
+        routecraft::route_distance(instance, result.solution.routes.at(1)) == 6,
+        "Khoảng cách tuyến hai phải được tính theo internal_index");
+    require(
+        routecraft::solution_distance(instance, result.solution) == 10,
+        "Tổng khoảng cách phải được tính theo internal_index");
+    require_valid_solver_output(instance, result.solution);
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -215,6 +287,8 @@ int main() {
         {"tuyen_vua_day_tai", test_route_can_fill_capacity_exactly},
         {"nhieu_tuyen_phuc_vu_dung_mot_lan", test_multiple_routes_serve_every_customer_once},
         {"pha_hoa_theo_chi_so_noi_bo", test_equal_distances_use_lower_internal_index},
+        {"tra_cuu_chi_so_noi_bo", test_internal_index_lookup_rejects_missing_and_duplicate_nodes},
+        {"node_dao_thu_tu_van_dung_chi_so_noi_bo", test_reordered_nodes_are_resolved_by_internal_index},
     };
 
     int failed_tests = 0;

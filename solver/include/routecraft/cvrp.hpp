@@ -26,6 +26,10 @@ struct Instance {
     std::vector<Node> nodes;
 };
 
+const Node& node_by_internal_index(
+    const Instance& instance,
+    NodeIndex internal_index);
+
 struct Route {
     std::vector<NodeIndex> stops;
 };
