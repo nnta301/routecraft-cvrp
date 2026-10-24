@@ -23,6 +23,15 @@ function(run_valid_json fixture)
         message(FATAL_ERROR "${fixture}: JSON phải thành công, exit=${result}, stderr='${stderr}'")
     endif()
     require_contains("${stdout}" "\"feasible\": true" "${fixture} JSON")
+    if(fixture STREQUAL "sprint1-full-capacity.vrp")
+        require_contains("${stdout}" "\"route_loads\": [10]" "${fixture} tải đúng sức chứa")
+    endif()
+    if(fixture STREQUAL "sprint1-depot-not-first.vrp")
+        require_contains(
+            "${stdout}"
+            "\"internal_index\": 0, \"original_id\": \"99\""
+            "${fixture} ánh xạ depot")
+    endif()
 endfunction()
 
 function(require_axis_distance first_x first_y second_x second_y result_variable)
