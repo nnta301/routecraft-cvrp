@@ -21,6 +21,13 @@
 - Với CLI, API, TXT và JSON, kiểm tra field name, type, unit, quy ước ID, feasibility result và error behavior có khớp contract được tài liệu hóa không.
 - Không yêu cầu cập nhật tài liệu cho refactor nội bộ không làm thay đổi behavior đã tài liệu hóa.
 
+## Rà soát trạng thái triển khai
+
+- Khi PR thay đổi hoặc hoàn thành chức năng, đọc chéo `README.md`, `solver/README.md` và tài liệu sprint hiện tại, kể cả khi các file đó không nằm trong diff.
+- Tìm các phát biểu trạng thái như “chưa triển khai”, “chưa hỗ trợ”, “chưa hoàn thành” và “được từ chối”; đối chiếu từng phát biểu với code và kiểm thử sau thay đổi.
+- Báo thiếu cập nhật khi mô tả trạng thái hiện hành mâu thuẫn với chức năng thực tế. Comment phải nêu file, phát biểu lỗi thời và bằng chứng từ code hoặc test.
+- Phân biệt ghi chép lịch sử có mốc thời gian với mô tả trạng thái hiện hành. Không yêu cầu viết lại lịch sử hoặc sao chép trạng thái từng issue vào tài liệu sprint.
+
 ## Tính đúng CVRP
 
 - Mỗi customer phải được phục vụ đúng một lần.

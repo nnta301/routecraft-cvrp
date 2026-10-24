@@ -2,7 +2,9 @@
 
 ## Thành phần và trách nhiệm
 
-`solver` có scaffold thư viện lõi C++ (`routecraft_core`) và `solver/cli` là lớp dòng lệnh mỏng liên kết thư viện đó. Hiện lõi chỉ cung cấp phiên bản; chưa có mô hình instance, parser, khoảng cách, heuristic, cải thiện hay validator. `backend` dự kiến kiểm tra request, quản lý thư mục tạm theo request, chạy CLI qua danh sách đối số và chuyển kết quả JSON. `frontend` dự kiến hiển thị dữ liệu, tuyến và chỉ số.
+`solver` có thư viện lõi C++ (`routecraft_core`) và `solver/cli` là lớp dòng lệnh mỏng liên kết thư viện đó. Hiện lõi đã cung cấp mô hình dữ liệu CVRP tối thiểu gồm `Node`, `Instance`, `Route`, `Solution` và cấu trúc dữ liệu `ValidationResult` dùng cho validator; depot dùng chỉ số nội bộ `0` và mỗi node giữ `original_id` để khôi phục ID nguồn. Lõi cũng có tiện ích tính khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm.
+
+Parser `.vrp` đã hỗ trợ phạm vi CVRPLIB của Sprint 1: một depot, `TYPE: CVRP`, `EDGE_WEIGHT_TYPE: EUC_2D`, chuẩn hóa depot nội bộ `0`, giữ ID nguồn và kiểm tra dữ liệu đầu vào. Validator độc lập tính lại tải, khoảng cách từng tuyến và tổng khoảng cách từ instance cùng route; nó kiểm tra depot, chỉ số khách, khách thiếu/trùng, quá tải và tổng khai báo. Heuristic và bước cải thiện bổ sung vẫn chưa được triển khai. `backend` dự kiến kiểm tra request, quản lý thư mục tạm theo request, chạy CLI qua danh sách đối số và chuyển kết quả JSON. `frontend` dự kiến hiển thị dữ liệu, tuyến và chỉ số.
 
 Luồng dự kiến: người dùng hoặc CLI cung cấp instance → parser/kiểm tra dữ liệu → solver tạo nghiệm → validator tính lại độc lập → CLI xuất TXT/JSON hoặc backend trả JSON → frontend trực quan hóa. Log và chẩn đoán đi stderr; dữ liệu kết quả máy đọc được đi stdout.
 
@@ -23,5 +25,3 @@ data/
   benchmarks/   # benchmark có nguồn gốc
 experiments/    # cấu hình, kết quả được chọn để lưu và phân tích
 ```
-
-Scaffold hiện đã tạo các thư mục C++ nêu trên; các cấu trúc backend, frontend, data và experiments vẫn là cấu trúc đích. CLI cần hoạt động độc lập nhưng dùng chung lõi với web. Docker chỉ được xem xét sau; binary trong container phải tương thích môi trường container. Một dịch vụ có thể phục vụ frontend đã build và API ở giai đoạn đầu. Render là lựa chọn hosting dự kiến, chưa chốt cấu hình hay chi phí.

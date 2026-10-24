@@ -20,13 +20,19 @@ Solver C++ dùng chung lõi cho CLI và web. Các cấu hình nghiên cứu dự
 
 ## Trạng thái thực tế
 
-Repository đã có scaffold C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions. Bộ giải CVRP, parser, thuật toán, xuất nghiệm, backend, frontend, Docker, benchmark và API **chưa triển khai**. GitHub Actions workflow `Build and test` đã chạy thành công trên GitHub cho cả cấu hình `Debug` và `Release`, xác minh scaffold hiện tại build được và các CTest đã đăng ký đều pass.
+Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions.
+
+Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp` hiện hỗ trợ một depot, `TYPE: CVRP` và `EDGE_WEIGHT_TYPE: EUC_2D`; parser kiểm tra dữ liệu đầu vào, chuẩn hóa depot về chỉ số nội bộ `0` và giữ ID nguồn.
+
+Lõi cũng đã có heuristic Nearest Neighbor xác định, có xét tải trọng. Với instance hợp lệ, heuristic chọn khách chưa phục vụ gần nhất còn vừa tải; khi đồng khoảng cách, chọn chỉ số nội bộ nhỏ hơn. Mỗi tuyến bắt đầu/kết thúc tại depot `0`, và lõi đo riêng thời gian dựng nghiệm. Validator độc lập tính lại các số liệu từ instance và routes, phát hiện lỗi depot, chỉ số khách, phục vụ, tải trọng và tổng khoảng cách khai báo. CLI có lệnh `solve` cho Nearest Neighbor, xuất JSON hoặc TXT ra stdout. Backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
+
+Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. [Run 38596237542](https://github.com/nnta301/routecraft-cvrp/actions/runs/38596237542) là bằng chứng lịch sử cho scaffold ban đầu trên hai cấu hình; kết quả kiểm tra cho thay đổi tiếp theo được ghi tại PR tương ứng.
 
 ## Trạng thái hiện tại
 
 Sprint hiện tại: [Sprint 1 — CVRP Baseline CLI](docs/sprints/sprint-01.md)
 
-## Build và kiểm tra scaffold
+## Build và kiểm tra
 
 Từ root repository, các lệnh sau cấu hình, biên dịch và chạy test đã đăng ký:
 
@@ -37,6 +43,17 @@ ctest --test-dir build/Debug --output-on-failure
 ```
 
 `configure` tạo cấu hình build, `build` biên dịch target, còn CTest chạy các test đã đăng ký. Dùng `Debug` cho phát triển/gỡ lỗi; `Release` là cấu hình dự kiến dùng cho thực nghiệm sau này. Với generator một cấu hình, executable nằm ở `build/<config>/bin/routecraft`; generator nhiều cấu hình thường thêm thư mục cấu hình bên dưới `bin`.
+
+## Chạy solver Sprint 1
+
+Sau khi build, chạy pipeline parser → Nearest Neighbor → validator → xuất kết quả:
+
+```powershell
+.\build\Debug\bin\Debug\routecraft.exe solve --input .\solver\tests\fixtures\cli-noncontiguous.vrp --method nn --format json
+.\build\Debug\bin\Debug\routecraft.exe solve --input .\solver\tests\fixtures\cli-noncontiguous.vrp --method nn --format txt
+```
+
+Ví dụ dùng đường dẫn executable của cấu hình Debug với Ninja trên Windows; chọn đường dẫn output tương ứng nếu dùng generator hoặc cấu hình khác. Sprint 1 chỉ hỗ trợ `--method nn` và định dạng `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
 
 ## Tài liệu
 

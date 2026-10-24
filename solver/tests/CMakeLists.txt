@@ -4,3 +4,67 @@ add_test(
         "-DROUTECRAFT_EXECUTABLE=$<TARGET_FILE:routecraft>"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_smoke.cmake"
 )
+
+add_test(
+    NAME routecraft_cli_solve
+    COMMAND "${CMAKE_COMMAND}"
+        "-DROUTECRAFT_EXECUTABLE=$<TARGET_FILE:routecraft>"
+        "-DROUTECRAFT_FIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/cli-noncontiguous.vrp"
+        "-DROUTECRAFT_INVALID_FIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/cli-invalid.vrp"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_solve.cmake"
+)
+
+add_executable(routecraft_core_tests
+    cvrp_core_tests.cpp
+)
+
+target_link_libraries(routecraft_core_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_core_tests
+    COMMAND routecraft_core_tests
+)
+
+add_executable(routecraft_parser_tests
+    vrp_parser_tests.cpp
+)
+
+target_link_libraries(routecraft_parser_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_parser_tests
+    COMMAND routecraft_parser_tests
+)
+
+add_executable(routecraft_nearest_neighbor_tests
+    nearest_neighbor_tests.cpp
+)
+
+target_link_libraries(routecraft_nearest_neighbor_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_nearest_neighbor_tests
+    COMMAND routecraft_nearest_neighbor_tests
+)
+
+add_executable(routecraft_validator_tests
+    validator_tests.cpp
+)
+
+target_link_libraries(routecraft_validator_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_validator_tests
+    COMMAND routecraft_validator_tests
+)
+
+add_executable(routecraft_result_export_tests
+    result_export_tests.cpp
+)
+
+target_link_libraries(routecraft_result_export_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_result_export_tests
+    COMMAND routecraft_result_export_tests
+)

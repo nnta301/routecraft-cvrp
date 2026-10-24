@@ -1,0 +1,19 @@
+# Cấu hình CodeRabbit cho RouteCraft CVRP.
+# Quy tắc review nghiệp vụ được duy trì tại
+# .github/copilot-instructions.md để Copilot và CodeRabbit cùng dùng một nguồn.
+
+language: "vi-VN"
+
+reviews:
+  profile: "chill"
+  request_changes_workflow: false
+  review_details: true
+
+  auto_review:
+    enabled: false
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - files: ".github/copilot-instructions.md"
+        applyTo: "**/*"
