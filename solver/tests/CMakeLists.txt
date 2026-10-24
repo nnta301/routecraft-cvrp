@@ -37,3 +37,14 @@ add_test(
     NAME routecraft_nearest_neighbor_tests
     COMMAND routecraft_nearest_neighbor_tests
 )
+
+add_executable(routecraft_validator_tests
+    validator_tests.cpp
+)
+
+target_link_libraries(routecraft_validator_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_validator_tests
+    COMMAND routecraft_validator_tests
+)

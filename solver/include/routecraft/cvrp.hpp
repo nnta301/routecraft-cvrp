@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -36,6 +37,9 @@ struct Route {
 
 struct Solution {
     std::vector<Route> routes;
+    std::vector<Demand> route_loads;
+    std::vector<Distance> route_distances;
+    std::optional<Distance> total_distance;
 };
 
 struct ValidationResult {

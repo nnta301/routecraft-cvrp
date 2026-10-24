@@ -2,6 +2,8 @@
 #include "routecraft/distance.hpp"
 
 #include <exception>
+#include <cmath>
+#include <limits>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -138,6 +140,34 @@ void test_original_id_and_internal_depot_convention() {
         "Route hợp lệ phải bắt đầu và kết thúc tại depot nội bộ 0");
 }
 
+void test_checked_distance_validates_domain_before_rounding() {
+    Node first = make_node(0, "0", 0, 0, 0, true);
+    Node second = make_node(1, "1", 1.5, 0, 1);
+    require(routecraft::checked_euclidean_distance(first, second) == 2,
+        "Khoảng cách hợp lệ phải giữ cách làm tròn nửa lên");
+    second.x = 1;
+    second.y = 1;
+    require(routecraft::checked_euclidean_distance(first, second) == 1,
+        "Khoảng cách sqrt(2) phải làm tròn thành 1");
+    second.y = 0;
+    const double upper_bound = std::ldexp(1.0, 63);
+    second.x = std::nextafter(upper_bound, 0.0);
+    require(routecraft::checked_euclidean_distance(first, second) ==
+            static_cast<Distance>(second.x),
+        "Giá trị double ngay dưới 2^63 vẫn biểu diễn được");
+    second.x = upper_bound;
+    require(!routecraft::checked_euclidean_distance(first, second),
+        "2^63 phải bị loại trước llround");
+    first.x = -std::numeric_limits<double>::max();
+    second.x = std::numeric_limits<double>::max();
+    require(!routecraft::checked_euclidean_distance(first, second),
+        "Hiệu tọa độ hữu hạn bị tràn phải bị loại");
+    first.x = 0;
+    second.x = std::numeric_limits<double>::quiet_NaN();
+    require(!routecraft::checked_euclidean_distance(first, second),
+        "Khoảng cách NaN phải bị loại");
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -147,6 +177,7 @@ struct TestCase {
 
 int main() {
     const std::vector<TestCase> test_cases{
+        {"euc_2d_kiem_tra_mien", test_checked_distance_validates_domain_before_rounding},
         {"euc_2d_lam_tron_mot_canh", test_euclidean_distance_rounds_single_edge},
         {"euc_2d_lam_tron_tung_canh", test_route_distance_rounds_each_edge_before_summing},
         {"tuyen_co_canh_quay_ve_depot", test_route_distance_includes_return_to_depot},

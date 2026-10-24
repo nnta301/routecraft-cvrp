@@ -28,6 +28,6 @@ Output JSON dự kiến có `routes`, `route_loads`, `route_distances`, `total_d
 }
 ```
 
-`route_loads`, `route_distances` tương ứng cùng thứ tự với `routes`; khoảng cách là số nguyên đơn vị tọa độ theo `EUC_2D`. `total_distance` là tổng các `route_distances`; `num_routes` là số tuyến; `feasible` phản ánh validator. `timings_ms` là số thực không âm, chỉ đo thời gian solver theo pha và loại trừ đọc/ghi file, khởi động subprocess và mạng. Tên pha có thể mở rộng nhưng phải được mô tả khi dùng.
+`route_loads`, `route_distances` tương ứng cùng thứ tự với `routes`; khoảng cách là số nguyên đơn vị tọa độ theo `EUC_2D`. Validator luôn tính lại ba số liệu này từ `instance` và `routes`, không tin các số liệu đã khai báo bởi nghiệm; CLI phải xuất số liệu đã tính lại. Nếu có `total_distance` được khai báo trong nghiệm, validator đối chiếu nó với tổng tính lại. `num_routes` là số tuyến; `feasible` phản ánh validator. `timings_ms` là số thực không âm, chỉ đo thời gian solver theo pha và loại trừ đọc/ghi file, khởi động subprocess và mạng. Tên pha có thể mở rộng nhưng phải được mô tả khi dùng.
 
 TXT phục vụ người đọc phải dùng `original_id`, kèm tải và khoảng cách từng tuyến. JSON giữ chỉ số nội bộ để không mơ hồ, cùng ánh xạ ID trong dữ liệu instance/metadata khi cần khôi phục ID nguồn. Lỗi dự kiến trả mã/thông điệp có thể máy đọc được; không được xuất nghiệm khả thi giả khi input không hợp lệ.

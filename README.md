@@ -24,7 +24,7 @@ Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `r
 
 Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp` hiện hỗ trợ một depot, `TYPE: CVRP` và `EDGE_WEIGHT_TYPE: EUC_2D`; parser kiểm tra dữ liệu đầu vào, chuẩn hóa depot về chỉ số nội bộ `0` và giữ ID nguồn.
 
-Lõi cũng đã có heuristic Nearest Neighbor xác định, có xét tải trọng. Với instance hợp lệ, heuristic chọn khách chưa phục vụ gần nhất còn vừa tải; khi đồng khoảng cách, chọn chỉ số nội bộ nhỏ hơn. Mỗi tuyến bắt đầu/kết thúc tại depot `0`, và lõi đo riêng thời gian dựng nghiệm. Validator hoàn chỉnh, lệnh `solve`, xuất nghiệm, backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
+Lõi cũng đã có heuristic Nearest Neighbor xác định, có xét tải trọng. Với instance hợp lệ, heuristic chọn khách chưa phục vụ gần nhất còn vừa tải; khi đồng khoảng cách, chọn chỉ số nội bộ nhỏ hơn. Mỗi tuyến bắt đầu/kết thúc tại depot `0`, và lõi đo riêng thời gian dựng nghiệm. Validator độc lập tính lại các số liệu từ instance và routes, phát hiện lỗi depot, chỉ số khách, phục vụ, tải trọng và tổng khoảng cách khai báo. Lệnh `solve`, xuất nghiệm, backend, frontend, Docker, benchmark và API vẫn chưa triển khai.
 
 Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. Kết quả kiểm tra cho từng thay đổi được ghi tại PR tương ứng.
 

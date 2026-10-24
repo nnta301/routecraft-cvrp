@@ -1,8 +1,20 @@
 #include "routecraft/distance.hpp"
 
 #include <cmath>
+#include <limits>
 
 namespace routecraft {
+
+std::optional<Distance> checked_euclidean_distance(
+    const Node& first, const Node& second) noexcept {
+    const double distance = std::hypot(first.x - second.x, first.y - second.y);
+    // double làm tròn INT64_MAX lên 2^63; phải loại cả giá trị tại biên này.
+    if (!std::isfinite(distance) ||
+        distance >= static_cast<double>(std::numeric_limits<Distance>::max())) {
+        return std::nullopt;
+    }
+    return static_cast<Distance>(std::llround(distance));
+}
 
 Distance euclidean_distance(const Node& first, const Node& second) noexcept {
     const double delta_x = first.x - second.x;

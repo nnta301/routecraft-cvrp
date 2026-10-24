@@ -4,6 +4,12 @@ Thành phần này chứa lõi C++ dùng chung và CLI mỏng gọi lõi đó. `
 
 Lõi cũng cung cấp tiện ích tính khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. CLI `routecraft` hiện hỗ trợ `--help`, `-h`, `--version` cùng smoke test CTest. Việc tách core khỏi CLI giúp parser, heuristic, validator và API sau này dùng chung logic.
 
+## Validator độc lập
+
+Validator được khai báo tại `routecraft/validator.hpp`. `validate_solution` tính lại tải từng tuyến, khoảng cách từng tuyến và tổng khoảng cách chỉ từ `Instance` cùng `routes`, dùng `EUC_2D` cho từng cạnh. Nó kiểm tra depot đầu/cuối và depot ở giữa tuyến, chỉ số khách, khách thiếu/trùng, quá tải và tổng khoảng cách khai báo. `ValidationResult` chứa `feasible`, lỗi bằng tiếng Việt và các số liệu đã tính lại; các trường tải/khoảng cách khai báo trong `Solution` không được dùng để chấp nhận nghiệm.
+
+Validator dùng `checked_euclidean_distance` trong utility dùng chung để kiểm tra khoảng cách cạnh hữu hạn và nằm trong miền `Distance` trước khi gọi `llround`. Validator cũng kiểm tra tràn số trước khi cộng tải, khoảng cách tuyến và tổng khoảng cách. Nếu vượt miền `int64_t`, nghiệm có `feasible=false` và lỗi tương ứng; số liệu bị tràn (cùng tổng phụ thuộc vào tuyến tràn) được giữ tại biên, không phải giá trị chính xác để xuất nghiệm. Những số liệu khác vẫn được tính độc lập.
+
 ## Parser `.vrp`
 
 Parser được khai báo tại `routecraft/vrp_parser.hpp`. Parser hỗ trợ tập định dạng CVRPLIB của Sprint 1:
@@ -25,4 +31,4 @@ Heuristic tạo từng tuyến từ depot nội bộ `0`, luôn chọn khách ch
 
 Heuristic không thay thế validator độc lập và không thực hiện Clarke–Wright, 2-opt hoặc relocate.
 
-Trạng thái: mô hình dữ liệu CVRP, tiện ích khoảng cách, parser `.vrp`, Nearest Neighbor và các unit test tương ứng đã có. Validator độc lập, đọc instance từ CLI, xuất nghiệm TXT/JSON và API vẫn chưa triển khai.
+Trạng thái: mô hình dữ liệu CVRP, tiện ích khoảng cách, parser `.vrp`, Nearest Neighbor, validator độc lập và các unit test tương ứng đã có. Đọc instance từ CLI, xuất nghiệm TXT/JSON và API vẫn chưa triển khai.
