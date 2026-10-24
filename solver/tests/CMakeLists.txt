@@ -14,6 +14,14 @@ add_test(
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_solve.cmake"
 )
 
+add_test(
+    NAME routecraft_sprint1_e2e
+    COMMAND "${CMAKE_COMMAND}"
+        "-DROUTECRAFT_EXECUTABLE=$<TARGET_FILE:routecraft>"
+        "-DROUTECRAFT_FIXTURE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/sprint1_e2e.cmake"
+)
+
 add_executable(routecraft_core_tests
     cvrp_core_tests.cpp
 )

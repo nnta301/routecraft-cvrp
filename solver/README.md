@@ -35,4 +35,20 @@ Heuristic tạo từng tuyến từ depot nội bộ `0`, luôn chọn khách ch
 
 Heuristic không thay thế validator độc lập và không thực hiện Clarke–Wright, 2-opt hoặc relocate.
 
+## Kiểm thử baseline Sprint 1
+
+Từ thư mục gốc repository, cấu hình và chạy CTest ở cả hai cấu hình:
+
+```text
+cmake -S . -B build/Debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+cmake --build build/Debug
+ctest --test-dir build/Debug --output-on-failure
+
+cmake -S . -B build/Release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build build/Release
+ctest --test-dir build/Release --output-on-failure
+```
+
+`routecraft_sprint1_e2e` chạy fixture `.vrp` qua CLI thật, đối chiếu JSON/TXT của toy instance và tính độc lập tải, khoảng cách theo tuyến cùng tổng khoảng cách. Baseline hiện chỉ phục vụ CVRP một depot với `EUC_2D`, `--method nn`, không giới hạn số xe `K` và chưa có pha cải thiện hay benchmark hiệu năng.
+
 Trạng thái: mô hình dữ liệu CVRP, tiện ích khoảng cách, parser `.vrp`, Nearest Neighbor, validator độc lập, CLI `solve`, xuất TXT/JSON và các unit test tương ứng đã có. API vẫn chưa triển khai.

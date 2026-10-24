@@ -40,6 +40,10 @@ Từ root repository, các lệnh sau cấu hình, biên dịch và chạy test 
 cmake -S . -B build/Debug -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
 cmake --build build/Debug
 ctest --test-dir build/Debug --output-on-failure
+
+cmake -S . -B build/Release -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build build/Release
+ctest --test-dir build/Release --output-on-failure
 ```
 
 `configure` tạo cấu hình build, `build` biên dịch target, còn CTest chạy các test đã đăng ký. Dùng `Debug` cho phát triển/gỡ lỗi; `Release` là cấu hình dự kiến dùng cho thực nghiệm sau này. Với generator một cấu hình, executable nằm ở `build/<config>/bin/routecraft`; generator nhiều cấu hình thường thêm thư mục cấu hình bên dưới `bin`.
@@ -54,6 +58,8 @@ Sau khi build, chạy pipeline parser → Nearest Neighbor → validator → xu�
 ```
 
 Ví dụ dùng đường dẫn executable của cấu hình Debug với Ninja trên Windows; chọn đường dẫn output tương ứng nếu dùng generator hoặc cấu hình khác. Sprint 1 chỉ hỗ trợ `--method nn` và định dạng `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
+
+Các regression CTest của Sprint 1 dùng fixture nhỏ trong `solver/tests/fixtures/` và chạy luồng CLI thực tế cho JSON/TXT. Baseline chỉ có Nearest Neighbor, không giới hạn số xe `K`, không có pha cải thiện và không phải benchmark hoặc phép đo hiệu năng.
 
 ## Tài liệu
 
