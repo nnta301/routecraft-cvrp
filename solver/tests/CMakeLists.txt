@@ -5,6 +5,15 @@ add_test(
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_smoke.cmake"
 )
 
+add_test(
+    NAME routecraft_cli_solve
+    COMMAND "${CMAKE_COMMAND}"
+        "-DROUTECRAFT_EXECUTABLE=$<TARGET_FILE:routecraft>"
+        "-DROUTECRAFT_FIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/cli-noncontiguous.vrp"
+        "-DROUTECRAFT_INVALID_FIXTURE=${CMAKE_CURRENT_SOURCE_DIR}/fixtures/cli-invalid.vrp"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cli_solve.cmake"
+)
+
 add_executable(routecraft_core_tests
     cvrp_core_tests.cpp
 )
@@ -47,4 +56,15 @@ target_link_libraries(routecraft_validator_tests PRIVATE routecraft_core)
 add_test(
     NAME routecraft_validator_tests
     COMMAND routecraft_validator_tests
+)
+
+add_executable(routecraft_result_export_tests
+    result_export_tests.cpp
+)
+
+target_link_libraries(routecraft_result_export_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_result_export_tests
+    COMMAND routecraft_result_export_tests
 )

@@ -2,6 +2,7 @@ add_library(routecraft_core STATIC
     src/cvrp.cpp
     src/distance.cpp
     src/nearest_neighbor.cpp
+    src/result_export.cpp
     src/validator.cpp
     src/version.cpp
     src/vrp_parser.cpp
