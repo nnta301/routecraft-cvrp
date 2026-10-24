@@ -3,10 +3,27 @@
 #include "routecraft/distance.hpp"
 
 #include <stdexcept>
+#include <limits>
 #include <vector>
 
 namespace routecraft {
 namespace {
+
+// Giữ tổng tại biên khi vượt miền biểu diễn; không thực hiện phép cộng gây tràn.
+bool checked_add(std::int64_t& total, std::int64_t value) {
+    const auto maximum = std::numeric_limits<std::int64_t>::max();
+    const auto minimum = std::numeric_limits<std::int64_t>::min();
+    if (value > 0 && total > maximum - value) {
+        total = maximum;
+        return false;
+    }
+    if (value < 0 && total < minimum - value) {
+        total = minimum;
+        return false;
+    }
+    total += value;
+    return true;
+}
 
 void add_error(ValidationResult& result, const std::string& error) {
     result.errors.push_back(error);
@@ -30,6 +47,7 @@ std::string route_label(std::size_t route_index) {
 
 ValidationResult validate_solution(const Instance& instance, const Solution& solution) {
     ValidationResult result;
+    bool total_distance_valid = true;
     std::vector<std::size_t> customer_visits(instance.nodes.size(), 0);
 
     for (std::size_t route_index = 0; route_index < solution.routes.size(); ++route_index) {
@@ -38,6 +56,8 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
         Demand route_load = 0;
         Distance route_distance = 0;
         bool contains_invalid_index = false;
+        bool load_valid = true;
+        bool distance_valid = true;
         std::vector<const Node*> resolved_stops;
         resolved_stops.reserve(route.stops.size());
 
@@ -78,7 +98,10 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
                 continue;
             }
 
-            route_load += node->demand;
+            if (load_valid && !checked_add(route_load, node->demand)) {
+                load_valid = false;
+                add_error(result, "Tải tuyến " + std::to_string(route_index + 1) + " vượt miền biểu diễn int64_t");
+            }
             if (node_index < customer_visits.size()) {
                 ++customer_visits.at(node_index);
             }
@@ -93,15 +116,26 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
 
         if (!contains_invalid_index) {
             for (std::size_t position = 1; position < resolved_stops.size(); ++position) {
-                route_distance += euclidean_distance(
+                const Distance edge_distance = euclidean_distance(
                     *resolved_stops.at(position - 1),
                     *resolved_stops.at(position));
+                if (!checked_add(route_distance, edge_distance)) {
+                    distance_valid = false;
+                    add_error(result, "Khoảng cách tuyến " + std::to_string(route_index + 1) + " vượt miền biểu diễn int64_t");
+                    break;
+                }
             }
         }
 
         result.route_loads.push_back(route_load);
         result.route_distances.push_back(route_distance);
-        result.total_distance += route_distance;
+        if (!distance_valid) {
+            total_distance_valid = false;
+            result.total_distance = std::numeric_limits<Distance>::max();
+        } else if (total_distance_valid && !checked_add(result.total_distance, route_distance)) {
+            total_distance_valid = false;
+            add_error(result, "Tổng khoảng cách vượt miền biểu diễn int64_t");
+        }
     }
 
     for (const Node& node : instance.nodes) {
@@ -127,7 +161,7 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
         }
     }
 
-    if (solution.total_distance.has_value() &&
+    if (total_distance_valid && solution.total_distance.has_value() &&
         solution.total_distance.value() != result.total_distance) {
         add_error(
             result,

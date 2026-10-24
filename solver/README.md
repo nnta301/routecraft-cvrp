@@ -8,6 +8,8 @@ Lõi cũng cung cấp tiện ích tính khoảng cách `EUC_2D`, tải tuyến, 
 
 Validator được khai báo tại `routecraft/validator.hpp`. `validate_solution` tính lại tải từng tuyến, khoảng cách từng tuyến và tổng khoảng cách chỉ từ `Instance` cùng `routes`, dùng `EUC_2D` cho từng cạnh. Nó kiểm tra depot đầu/cuối và depot ở giữa tuyến, chỉ số khách, khách thiếu/trùng, quá tải và tổng khoảng cách khai báo. `ValidationResult` chứa `feasible`, lỗi bằng tiếng Việt và các số liệu đã tính lại; các trường tải/khoảng cách khai báo trong `Solution` không được dùng để chấp nhận nghiệm.
 
+Validator kiểm tra tràn số trước khi cộng tải, khoảng cách tuyến và tổng khoảng cách. Nếu vượt miền `int64_t`, nghiệm có `feasible=false` và lỗi tương ứng; số liệu bị tràn (cùng tổng phụ thuộc vào tuyến tràn) được giữ tại biên, không phải giá trị chính xác để xuất nghiệm. Những số liệu khác vẫn được tính độc lập.
+
 ## Parser `.vrp`
 
 Parser được khai báo tại `routecraft/vrp_parser.hpp`. Parser hỗ trợ tập định dạng CVRPLIB của Sprint 1:

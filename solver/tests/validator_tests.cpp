@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -139,6 +140,48 @@ void test_incorrect_reported_total_distance_is_rejected() {
     require(result.total_distance == 15, "Không được dùng tổng khai báo sai");
 }
 
+void test_load_overflow_is_rejected() {
+    Instance instance = make_instance(std::numeric_limits<Demand>::max());
+    instance.nodes.at(1).demand = std::numeric_limits<Demand>::max();
+    instance.nodes.at(2).demand = 1;
+    const auto result = routecraft::validate_solution(
+        instance, Solution{{Route{{0, 1, 2, 0}}}});
+    require(!result.feasible, "Tải tràn số phải không khả thi");
+    require(has_error_containing(result, "Tải tuyến 1 vượt miền biểu diễn"), "Phải báo tràn tải");
+    require(result.route_loads.at(0) == std::numeric_limits<Demand>::max(), "Tải tràn phải giữ tại biên");
+    instance.nodes.at(2).demand = 0;
+    require(routecraft::validate_solution(instance, Solution{{Route{{0, 1, 2, 0}}}}).feasible,
+        "Tổng tải bằng INT64_MAX vẫn hợp lệ");
+}
+
+void test_route_distance_overflow_is_rejected() {
+    Instance instance = make_instance();
+    instance.nodes.at(1).x = 5e18;
+    instance.nodes.at(1).y = 0;
+    instance.nodes.at(2).x = 0;
+    instance.nodes.at(2).y = 0;
+    const auto result = routecraft::validate_solution(
+        instance, Solution{{Route{{0, 1, 2, 0}}}});
+    require(!result.feasible, "Khoảng cách tuyến tràn số phải không khả thi");
+    require(has_error_containing(result, "Khoảng cách tuyến 1 vượt miền biểu diễn"), "Phải báo tràn khoảng cách tuyến");
+    require(result.route_distances.at(0) == std::numeric_limits<Distance>::max(), "Khoảng cách tràn phải giữ tại biên");
+    require(result.total_distance == std::numeric_limits<Distance>::max(), "Tổng phụ thuộc tuyến tràn phải giữ tại biên");
+}
+
+void test_total_distance_overflow_is_rejected() {
+    Instance instance = make_instance();
+    for (std::size_t index = 1; index < instance.nodes.size(); ++index) {
+        instance.nodes.at(index).x = 3e18;
+        instance.nodes.at(index).y = 0;
+    }
+    const auto result = routecraft::validate_solution(
+        instance, Solution{{Route{{0, 1, 0}}, Route{{0, 2, 0}}}});
+    require(!result.feasible, "Tổng khoảng cách tràn số phải không khả thi");
+    require(has_error_containing(result, "Tổng khoảng cách vượt miền biểu diễn"), "Phải báo tràn tổng");
+    require(result.total_distance == std::numeric_limits<Distance>::max(), "Tổng tràn phải giữ tại biên");
+    require(result.route_distances == std::vector<Distance>{6000000000000000000LL, 6000000000000000000LL}, "Khoảng cách từng tuyến vẫn phải đúng");
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -148,6 +191,9 @@ struct TestCase {
 
 int main() {
     const std::vector<TestCase> test_cases{
+        {"tran_tai", test_load_overflow_is_rejected},
+        {"tran_khoang_cach_tuyen", test_route_distance_overflow_is_rejected},
+        {"tran_tong_khoang_cach", test_total_distance_overflow_is_rejected},
         {"nghiem_hop_le_tinh_lai_so_lieu", test_valid_solution_recalculates_metrics_and_ignores_reported_route_metrics},
         {"depot_dau_cuoi", test_route_must_start_and_end_at_depot},
         {"depot_o_giua", test_depot_in_middle_is_rejected},
