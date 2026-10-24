@@ -32,6 +32,12 @@ function(run_valid_json fixture)
             "\"internal_index\": 0, \"original_id\": \"99\""
             "${fixture} ánh xạ depot")
     endif()
+    if(fixture STREQUAL "sprint1-noncontiguous-ids.vrp")
+        require_contains(
+            "${stdout}"
+            "\"node_ids\": [{\"internal_index\": 0, \"original_id\": \"50\"}, {\"internal_index\": 1, \"original_id\": \"9\"}, {\"internal_index\": 2, \"original_id\": \"700\"}]"
+            "${fixture} ánh xạ ID không liên tiếp")
+    endif()
 endfunction()
 
 function(require_axis_distance first_x first_y second_x second_y result_variable)
@@ -98,28 +104,26 @@ if(NOT toy_json_result EQUAL 0 OR NOT toy_json_stderr STREQUAL "" OR
     message(FATAL_ERROR "CLI toy phải xuất cả JSON và TXT mà không có chẩn đoán lỗi")
 endif()
 
-# Số liệu dưới đây được tính độc lập từ tọa độ và demand fixture, không lấy từ solver/exporter.
-set(x_100 0)
-set(y_100 0)
-set(demand_100 0)
-set(x_8 3)
-set(y_8 0)
-set(demand_8 4)
-set(x_41 5)
-set(y_41 0)
-set(demand_41 6)
-set(x_17 0)
-set(y_17 4)
-set(demand_17 3)
-set(x_90 0)
-set(y_90 7)
-set(demand_90 7)
-set(x_29 -2)
-set(y_29 0)
-set(demand_29 5)
-set(x_75 -5)
-set(y_75 0)
-set(demand_75 5)
+# Số liệu được tính độc lập từ fixture, không lấy từ solver/exporter.
+file(STRINGS "${ROUTECRAFT_FIXTURE_DIR}/sprint1-toy.vrp" toy_lines)
+set(toy_section "")
+foreach(line IN LISTS toy_lines)
+    string(STRIP "${line}" line)
+    if(line STREQUAL "NODE_COORD_SECTION")
+        set(toy_section "coordinates")
+    elseif(line STREQUAL "DEMAND_SECTION")
+        set(toy_section "demands")
+    elseif(line STREQUAL "DEPOT_SECTION")
+        set(toy_section "")
+    elseif(line MATCHES "^([0-9]+)[ \t]+(-?[0-9]+)[ \t]+(-?[0-9]+)$" AND
+           toy_section STREQUAL "coordinates")
+        set(x_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}")
+        set(y_${CMAKE_MATCH_1} "${CMAKE_MATCH_3}")
+    elseif(line MATCHES "^([0-9]+)[ \t]+(-?[0-9]+)$" AND
+           toy_section STREQUAL "demands")
+        set(demand_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}")
+    endif()
+endforeach()
 
 independent_route_metrics("100;29;75;100" load_1 distance_1)
 independent_route_metrics("100;8;41;100" load_2 distance_2)
