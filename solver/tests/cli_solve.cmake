@@ -57,5 +57,19 @@ run_solve(invalid_input 1 empty nonempty solve --input "${ROUTECRAFT_INVALID_FIX
 run_solve(unsupported_method 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method cw --format json)
 run_solve(unsupported_format 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn --format csv)
 run_solve(unsupported_parameter 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn --format json --output result.json)
-run_solve(duplicate_empty_input 2 empty nonempty solve --input "" --input "${ROUTECRAFT_FIXTURE}" --method nn --format json)
+execute_process(
+    COMMAND "${ROUTECRAFT_EXECUTABLE}" solve --input "" --input "${ROUTECRAFT_FIXTURE}" --method nn --format json
+    RESULT_VARIABLE duplicate_empty_input_result
+    OUTPUT_VARIABLE duplicate_empty_input_stdout
+    ERROR_VARIABLE duplicate_empty_input_stderr
+)
+if(NOT duplicate_empty_input_result EQUAL 2)
+    message(FATAL_ERROR "duplicate_empty_input: expected exit code 2, got ${duplicate_empty_input_result}")
+endif()
+if(NOT duplicate_empty_input_stdout STREQUAL "")
+    message(FATAL_ERROR "duplicate_empty_input: stdout must be empty, got '${duplicate_empty_input_stdout}'")
+endif()
+if(duplicate_empty_input_stderr STREQUAL "")
+    message(FATAL_ERROR "duplicate_empty_input: stderr must contain a diagnostic")
+endif()
 run_solve(missing_parameter 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn)
