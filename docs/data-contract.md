@@ -12,7 +12,7 @@ Parser `.vrp` dự kiến chuyển dữ liệu nguồn sang quy ước này và 
 
 ## Output
 
-Output JSON dự kiến có `routes`, `route_loads`, `route_distances`, `total_distance`, `num_routes`, `feasible`, `instance`, `method` và thời gian theo giai đoạn. `routes` dùng **chỉ số nội bộ** và luôn chứa `0` đầu/cuối; ví dụ minh họa (không phải kết quả thực nghiệm):
+Output JSON có `routes`, `route_loads`, `route_distances`, `total_distance`, `num_routes`, `feasible`, `instance`, `method`, `timings_ms` và `node_ids`. `routes` dùng **chỉ số nội bộ** và luôn chứa `0` đầu/cuối; `node_ids` là mảng object có `internal_index` và `original_id` để khôi phục ID nguồn. Ví dụ minh họa:
 
 ```json
 {
@@ -24,10 +24,15 @@ Output JSON dự kiến có `routes`, `route_loads`, `route_distances`, `total_d
   "total_distance": 18,
   "num_routes": 1,
   "feasible": true,
-  "timings_ms": {"construct": 1.2, "improve": 0.0, "validate": 0.1}
+  "timings_ms": {"construct": 1.2, "improve": 0.0, "validate": 0.1},
+  "node_ids": [
+    {"internal_index": 0, "original_id": "42"},
+    {"internal_index": 1, "original_id": "7"},
+    {"internal_index": 2, "original_id": "99"}
+  ]
 }
 ```
 
-`route_loads`, `route_distances` tương ứng cùng thứ tự với `routes`; khoảng cách là số nguyên đơn vị tọa độ theo `EUC_2D`. Validator luôn tính lại ba số liệu này từ `instance` và `routes`, không tin các số liệu đã khai báo bởi nghiệm; CLI phải xuất số liệu đã tính lại. Nếu có `total_distance` được khai báo trong nghiệm, validator đối chiếu nó với tổng tính lại. `num_routes` là số tuyến; `feasible` phản ánh validator. `timings_ms` là số thực không âm, chỉ đo thời gian solver theo pha và loại trừ đọc/ghi file, khởi động subprocess và mạng. Tên pha có thể mở rộng nhưng phải được mô tả khi dùng.
+`route_loads`, `route_distances` tương ứng cùng thứ tự với `routes`; khoảng cách là số nguyên đơn vị tọa độ theo `EUC_2D`. Validator luôn tính lại ba số liệu này từ `instance` và `routes`, không tin các số liệu đã khai báo bởi nghiệm; CLI xuất số liệu đã tính lại. `num_routes` là số tuyến; `feasible` phản ánh validator. `timings_ms` chứa `construct`, `improve` và `validate`; Sprint 1 đặt `improve` bằng `0.0` vì chưa có pha cải thiện. Các thời gian là số thực không âm, chỉ đo thời gian solver theo pha và loại trừ đọc/ghi file, khởi động subprocess và mạng.
 
 TXT phục vụ người đọc phải dùng `original_id`, kèm tải và khoảng cách từng tuyến. JSON giữ chỉ số nội bộ để không mơ hồ, cùng ánh xạ ID trong dữ liệu instance/metadata khi cần khôi phục ID nguồn. Lỗi dự kiến trả mã/thông điệp có thể máy đọc được; không được xuất nghiệm khả thi giả khi input không hợp lệ.
