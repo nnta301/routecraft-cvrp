@@ -33,16 +33,27 @@ int solve(int argc, char* argv[]) {
     std::string input_path;
     std::string method;
     std::string format;
+    bool input_seen = false;
+    bool method_seen = false;
+    bool format_seen = false;
     for (int index = 2; index < argc; index += 2) {
         if (index + 1 >= argc) return usage_error("Thiếu giá trị cho tham số");
         const std::string_view option{argv[index]};
         const std::string value{argv[index + 1]};
-        if (option == "--input" && input_path.empty()) input_path = value;
-        else if (option == "--method" && method.empty()) method = value;
-        else if (option == "--format" && format.empty()) format = value;
+        if (option == "--input" && !input_seen) {
+            input_seen = true;
+            input_path = value;
+        } else if (option == "--method" && !method_seen) {
+            method_seen = true;
+            method = value;
+        } else if (option == "--format" && !format_seen) {
+            format_seen = true;
+            format = value;
+        }
         else return usage_error("Tham số không hỗ trợ hoặc bị lặp: " + std::string(option));
     }
-    if (input_path.empty() || method.empty() || format.empty()) {
+    if (!input_seen || !method_seen || !format_seen ||
+        input_path.empty() || method.empty() || format.empty()) {
         return usage_error("solve yêu cầu --input, --method và --format");
     }
     if (method != "nn") return usage_error("Sprint 1 chỉ hỗ trợ --method nn");

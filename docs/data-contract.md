@@ -27,7 +27,8 @@ Output JSON có `routes`, `route_loads`, `route_distances`, `total_distance`, `n
   "timings_ms": {"construct": 1.2, "improve": 0.0, "validate": 0.1},
   "node_ids": [
     {"internal_index": 0, "original_id": "42"},
-    {"internal_index": 1, "original_id": "7"}
+    {"internal_index": 1, "original_id": "7"},
+    {"internal_index": 2, "original_id": "99"}
   ]
 }
 ```

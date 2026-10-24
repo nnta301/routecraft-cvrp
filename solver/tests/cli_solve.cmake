@@ -57,4 +57,5 @@ run_solve(invalid_input 1 empty nonempty solve --input "${ROUTECRAFT_INVALID_FIX
 run_solve(unsupported_method 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method cw --format json)
 run_solve(unsupported_format 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn --format csv)
 run_solve(unsupported_parameter 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn --format json --output result.json)
+run_solve(duplicate_empty_input 2 empty nonempty solve --input "" --input "${ROUTECRAFT_FIXTURE}" --method nn --format json)
 run_solve(missing_parameter 2 empty nonempty solve --input "${ROUTECRAFT_FIXTURE}" --method nn)
