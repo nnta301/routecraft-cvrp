@@ -182,6 +182,17 @@ void test_total_distance_overflow_is_rejected() {
     require(result.route_distances == std::vector<Distance>{6000000000000000000LL, 6000000000000000000LL}, "Khoảng cách từng tuyến vẫn phải đúng");
 }
 
+void test_edge_outside_distance_domain_is_rejected() {
+    Instance instance = make_instance();
+    instance.nodes.at(1).x = 1e20;
+    instance.nodes.at(1).y = 0;
+    const auto result = routecraft::validate_solution(
+        instance, Solution{{Route{{0, 1, 2, 0}}}});
+    require(!result.feasible, "Một cạnh vượt miền Distance phải không khả thi");
+    require(has_error_containing(result, "Khoảng cách tuyến 1 vượt miền biểu diễn"), "Phải báo cạnh vượt miền");
+    require(result.route_distances.at(0) == std::numeric_limits<Distance>::max(), "Cạnh vượt miền phải giữ tại biên");
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -191,6 +202,7 @@ struct TestCase {
 
 int main() {
     const std::vector<TestCase> test_cases{
+        {"canh_vuot_mien_distance", test_edge_outside_distance_domain_is_rejected},
         {"tran_tai", test_load_overflow_is_rejected},
         {"tran_khoang_cach_tuyen", test_route_distance_overflow_is_rejected},
         {"tran_tong_khoang_cach", test_total_distance_overflow_is_rejected},

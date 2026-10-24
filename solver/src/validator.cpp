@@ -116,10 +116,12 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
 
         if (!contains_invalid_index) {
             for (std::size_t position = 1; position < resolved_stops.size(); ++position) {
-                const Distance edge_distance = euclidean_distance(
+                const auto edge_distance = checked_euclidean_distance(
                     *resolved_stops.at(position - 1),
                     *resolved_stops.at(position));
-                if (!checked_add(route_distance, edge_distance)) {
+                if (!edge_distance.has_value() ||
+                    !checked_add(route_distance, edge_distance.value())) {
+                    route_distance = std::numeric_limits<Distance>::max();
                     distance_valid = false;
                     add_error(result, "Khoảng cách tuyến " + std::to_string(route_index + 1) + " vượt miền biểu diễn int64_t");
                     break;
