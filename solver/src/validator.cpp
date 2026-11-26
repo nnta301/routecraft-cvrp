@@ -58,6 +58,7 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
         bool contains_invalid_index = false;
         bool load_valid = true;
         bool distance_valid = true;
+        std::size_t route_customer_count = 0;
         std::vector<const Node*> resolved_stops;
         resolved_stops.reserve(route.stops.size());
 
@@ -98,6 +99,7 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
                 continue;
             }
 
+            ++route_customer_count;
             if (load_valid && !checked_add(route_load, node->demand)) {
                 load_valid = false;
                 add_error(result, "Tải tuyến " + std::to_string(route_index + 1) + " vượt miền biểu diễn int64_t");
@@ -105,6 +107,10 @@ ValidationResult validate_solution(const Instance& instance, const Solution& sol
             if (node_index < customer_visits.size()) {
                 ++customer_visits.at(node_index);
             }
+        }
+
+        if (!route.stops.empty() && !contains_invalid_index && route_customer_count == 0) {
+            add_error(result, label + " không phục vụ khách nào");
         }
 
         if (route_load > instance.capacity) {

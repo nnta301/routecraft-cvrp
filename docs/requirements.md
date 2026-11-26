@@ -4,7 +4,7 @@
 
 Input có một depot và dưới 100 khách, tọa độ 2D, nhu cầu không âm và capacity `Q` dương. Depot dùng chỉ số nội bộ `0`, trong khi ID gốc phải được giữ để xuất cho người dùng. `DIMENSION` tính cả depot. Một khách có nhu cầu lớn hơn `Q` là instance không khả thi trong mô hình hiện tại và phải bị từ chối/báo lỗi rõ ràng.
 
-Mỗi khách được phục vụ đúng một lần. Tuyến chứa depot ở đầu và cuối, tải không quá `Q`. Tổng khoảng cách là tổng các cạnh `EUC_2D` đã làm tròn riêng từng cạnh; đơn vị là đơn vị tọa độ, không tự gọi là km.
+Mỗi khách được phục vụ đúng một lần. Tuyến chứa depot ở đầu và cuối, phục vụ ít nhất một khách, tải không quá `Q`. Tổng khoảng cách là tổng các cạnh `EUC_2D` đã làm tròn riêng từng cạnh; đơn vị là đơn vị tọa độ, không tự gọi là km.
 
 ## Solver và CLI
 
