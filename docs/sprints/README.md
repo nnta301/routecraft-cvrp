@@ -9,7 +9,7 @@ Quy ước tên file: `sprint-01.md`, `sprint-02.md`, ...
 | Sprint | Trạng thái | Trọng tâm |
 | --- | --- | --- |
 | [Sprint 1](sprint-01.md) | Đã đóng | CVRP Baseline CLI |
-| Sprint 2 | Đang lập kế hoạch | Chờ chốt hướng nghiên cứu với giảng viên |
+| [Sprint 2](sprint-02.md) | Đang thực hiện | Hạ tầng thực nghiệm cho Clarke–Wright với điểm học được |
 
 ## Template cho Sprint tiếp theo
 

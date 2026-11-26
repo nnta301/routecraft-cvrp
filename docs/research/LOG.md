@@ -58,3 +58,16 @@
   Khối lượng ước tính 10–12 tuần, có thể nặng với Project 1.
 - Còn thiếu: đọc toàn văn Legrand et al. 2021 (HAL hal-03472209) trước khi trình bày.
 - Bước tiếp theo: trao đổi hướng với giảng viên, soạn đề cương ngắn, rồi lập kế hoạch Sprint 2.
+
+## 2026-11-26 — Chốt hướng, đọc Legrand 2021, lập Sprint 2
+
+- Quyết định: làm theo PA1 (đánh giá có kiểm soát); PA2 (Clarke–Wright ngẫu nhiên hóa theo điểm học) là phần mở rộng.
+  Người làm đề tài tự chốt, không chờ trao đổi thêm với giảng viên. Đề cương trình giảng viên soạn riêng, ngoài repo.
+- Đã đọc toàn văn Legrand et al. 2021 (HAL hal-03472209); chi tiết trong `lit-learned-savings.md` mục 1.2.
+  Họ dùng MLP, đặc trưng gần như trùng, chỉ sắp lại savings trong từng đoạn (SubLists), đánh giá trên bộ X và chỉ so với CW gốc
+  (Best SubLists tốt hơn khoảng 1,5%). Khác biệt bảo vệ được: đối thủ là savings tham số đã tune, so cùng ngân sách thời gian,
+  kiểm tra ngoài miền trên A/B/P. Thêm SubLists làm một đối chứng ở Sprint 3.
+- Giao thức thực nghiệm chốt ở `docs/experiment-protocol.md` (#26).
+- Sprint 2 (`docs/sprints/sprint-02.md`): #23 ma trận khoảng cách, #38 dữ liệu CVRPLIB A/B/P (73 instance, BKS đều tối ưu, kiểm tra lại
+  chi phí khớp), #39 script benchmark, #40 Clarke–Wright W0/W1, #41 kết quả baseline.
+- Bước tiếp theo: kết quả baseline NN và CW W0 trên A/B/P; chế độ chạy lưới W1 trong một tiến trình; lập Sprint 3.
