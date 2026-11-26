@@ -8,9 +8,9 @@ Sprint 1 đã đóng. Đã có mô hình dữ liệu, parser `.vrp`, NN, validat
 
 Clarke–Wright với điểm học được, phương án PA1 (đánh giá có kiểm soát): giữ nguyên thủ tục ghép, chỉ thay điểm xếp thứ tự phép ghép, rồi so savings gốc, savings tham số, tham số tune trực tiếp và mô hình học từ nhãn cạnh trên CVRPLIB A, B, P khi không ấn định số xe. Lập luận: [phản biện tính mới](research/novelty-review-learned-cw.md). Cách đo và tiêu chí thành công: [giao thức thực nghiệm](experiment-protocol.md).
 
-## Sprint 2 (đang thực hiện)
+## Sprint 2 (đã đóng)
 
-Hạ tầng thực nghiệm: ma trận khoảng cách dùng chung, dữ liệu CVRPLIB A, B, P kèm BKS, script chạy benchmark, giao thức thực nghiệm, Clarke–Wright nhận hàm điểm thay thế được (W0, W1) và kết quả baseline. Chi tiết: [Sprint 2](sprints/sprint-02.md).
+Hạ tầng thực nghiệm: ma trận khoảng cách dùng chung, dữ liệu CVRPLIB A, B, P kèm BKS, script chạy benchmark, giao thức thực nghiệm, Clarke–Wright nhận hàm điểm thay thế được (W0, W1, W1-grid) và kết quả baseline: gap trung bình NN 38,05%, W0 5,42%, W1-grid 2,00% trên 73 instance. Chi tiết: [Sprint 2](sprints/sprint-02.md).
 
 ## Tiếp theo
 
