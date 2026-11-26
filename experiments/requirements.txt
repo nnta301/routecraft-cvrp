@@ -1,0 +1,4 @@
+# Python 3.14.4 (Windows)
+numpy==2.5.5
+scikit-learn==1.9.1
+pyvrp==0.14.1
