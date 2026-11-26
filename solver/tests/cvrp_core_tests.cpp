@@ -60,7 +60,7 @@ void test_euclidean_distance_rounds_single_edge() {
     const Node second = make_node(1, "2", 1.0, 1.0, 0);
 
     require(
-        routecraft::euclidean_distance(first, second) == 1,
+        routecraft::checked_euclidean_distance(first, second) == 1,
         "Khoảng cách sqrt(2) phải được làm tròn thành 1");
 }
 
@@ -168,6 +168,61 @@ void test_checked_distance_validates_domain_before_rounding() {
         "Khoảng cách NaN phải bị loại");
 }
 
+void test_distance_matrix_is_symmetric_and_matches_checked_distance() {
+    const Instance instance{
+        "matrix-test",
+        10,
+        {
+            make_node(0, "a", 0.0, 0.0, 0, true),
+            make_node(1, "b", 3.0, 4.0, 1),
+            make_node(2, "c", 1.0, 1.0, 1),
+            make_node(3, "d", -7.5, 2.0, 1),
+        },
+    };
+
+    const routecraft::DistanceMatrix matrix(instance);
+    require(matrix.size() == 4, "Kích thước ma trận phải bằng số node");
+    for (NodeIndex i = 0; i < matrix.size(); ++i) {
+        require(matrix(i, i) == 0, "Đường chéo phải bằng 0");
+        for (NodeIndex j = 0; j < matrix.size(); ++j) {
+            require(matrix(i, j) == matrix(j, i), "Ma trận phải đối xứng");
+            require(
+                matrix(i, j) ==
+                    routecraft::checked_euclidean_distance(
+                        instance.nodes.at(i), instance.nodes.at(j)).value(),
+                "Ma trận phải khớp checked_euclidean_distance");
+        }
+    }
+}
+
+void test_distance_matrix_rejects_huge_coordinates() {
+    const Instance instance{
+        "matrix-overflow",
+        10,
+        {
+            make_node(0, "a", 0.0, 0.0, 0, true),
+            make_node(1, "b", 1e300, 0.0, 1),
+        },
+    };
+
+    bool rejected = false;
+    try {
+        const routecraft::DistanceMatrix matrix(instance);
+    } catch (const std::overflow_error&) {
+        rejected = true;
+    }
+    require(rejected, "Tọa độ cực lớn phải làm dựng ma trận ném lỗi");
+}
+
+void test_node_lookup_returns_correct_node() {
+    const Instance instance = make_instance();
+    for (NodeIndex i = 0; i < instance.nodes.size(); ++i) {
+        require(
+            &routecraft::node_by_internal_index(instance, i) == &instance.nodes.at(i),
+            "Tra cứu phải trả về đúng node");
+    }
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -184,6 +239,9 @@ int main() {
         {"tai_tuyen", test_route_load_ignores_depot},
         {"tong_do_dai_nghiem", test_solution_distance_sums_all_routes},
         {"id_goc_va_depot_noi_bo", test_original_id_and_internal_depot_convention},
+        {"ma_tran_doi_xung_khop_checked", test_distance_matrix_is_symmetric_and_matches_checked_distance},
+        {"ma_tran_nem_loi_toa_do_lon", test_distance_matrix_rejects_huge_coordinates},
+        {"tra_cuu_node_dung", test_node_lookup_returns_correct_node},
     };
 
     int failed_tests = 0;

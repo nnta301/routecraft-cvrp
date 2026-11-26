@@ -274,6 +274,25 @@ void test_reordered_nodes_are_resolved_by_internal_index() {
     require_valid_solver_output(instance, result.solution);
 }
 
+void test_huge_coordinates_make_nearest_neighbor_throw() {
+    const Instance instance{
+        "huge",
+        2,
+        {
+            make_node(0, "depot", 0.0, 0.0, 0, true),
+            make_node(1, "far", 1e300, 0.0, 1),
+        },
+    };
+
+    bool rejected = false;
+    try {
+        static_cast<void>(routecraft::solve_nearest_neighbor(instance));
+    } catch (const std::overflow_error&) {
+        rejected = true;
+    }
+    require(rejected, "NN phải báo lỗi khi khoảng cách không biểu diễn được");
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -289,6 +308,7 @@ int main() {
         {"pha_hoa_theo_chi_so_noi_bo", test_equal_distances_use_lower_internal_index},
         {"tra_cuu_chi_so_noi_bo", test_internal_index_lookup_rejects_missing_and_duplicate_nodes},
         {"node_dao_thu_tu_van_dung_chi_so_noi_bo", test_reordered_nodes_are_resolved_by_internal_index},
+        {"toa_do_lon_nem_loi", test_huge_coordinates_make_nearest_neighbor_throw},
     };
 
     int failed_tests = 0;

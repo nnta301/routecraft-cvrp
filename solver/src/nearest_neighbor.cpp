@@ -18,11 +18,11 @@ struct Candidate {
 
 std::optional<Candidate> find_nearest_feasible_customer(
     const Instance& instance,
+    const DistanceMatrix& distances,
     const std::vector<bool>& served,
     NodeIndex current_node,
     Demand current_load) {
     std::optional<Candidate> best_candidate;
-    const Node& current = node_by_internal_index(instance, current_node);
 
     for (NodeIndex candidate_index = 1; candidate_index < instance.nodes.size(); ++candidate_index) {
         if (served.at(candidate_index)) {
@@ -36,7 +36,7 @@ std::optional<Candidate> find_nearest_feasible_customer(
         }
 
         const Distance candidate_distance =
-            euclidean_distance(current, candidate);
+            distances(current_node, candidate_index);
 
         if (!best_candidate.has_value() ||
             candidate_distance < best_candidate->distance ||
@@ -58,6 +58,8 @@ NearestNeighborResult solve_nearest_neighbor(const Instance& instance) {
 
     const auto started_at = std::chrono::steady_clock::now();
 
+    const DistanceMatrix distances(instance);
+
     Solution solution;
     std::vector<bool> served(instance.nodes.size(), false);
     served.at(0) = true;
@@ -73,6 +75,7 @@ NearestNeighborResult solve_nearest_neighbor(const Instance& instance) {
             const std::optional<Candidate> next_customer =
                 find_nearest_feasible_customer(
                     instance,
+                    distances,
                     served,
                     current_node,
                     current_load);

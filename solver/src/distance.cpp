@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <limits>
+#include <stdexcept>
+#include <string>
 
 namespace routecraft {
 
@@ -16,11 +18,45 @@ std::optional<Distance> checked_euclidean_distance(
     return static_cast<Distance>(std::llround(distance));
 }
 
-Distance euclidean_distance(const Node& first, const Node& second) noexcept {
-    const double delta_x = first.x - second.x;
-    const double delta_y = first.y - second.y;
+namespace {
 
-    return static_cast<Distance>(std::llround(std::hypot(delta_x, delta_y)));
+Distance require_edge_distance(const Node& first, const Node& second) {
+    const std::optional<Distance> distance =
+        checked_euclidean_distance(first, second);
+    if (!distance.has_value()) {
+        throw std::overflow_error(
+            "Khoảng cách giữa node " + std::to_string(first.internal_index) +
+            " và node " + std::to_string(second.internal_index) +
+            " không hữu hạn hoặc vượt miền int64");
+    }
+    return *distance;
+}
+
+Distance checked_sum(Distance total, Distance addend) {
+    if (addend > std::numeric_limits<Distance>::max() - total) {
+        throw std::overflow_error("Tổng khoảng cách vượt miền int64");
+    }
+    return total + addend;
+}
+
+}
+
+DistanceMatrix::DistanceMatrix(const Instance& instance)
+    : size_(instance.nodes.size()) {
+    if (size_ != 0 && size_ > std::numeric_limits<std::size_t>::max() / size_) {
+        throw std::overflow_error("Số node quá lớn để dựng ma trận khoảng cách");
+    }
+    values_.assign(size_ * size_, 0);
+
+    for (NodeIndex i = 0; i < size_; ++i) {
+        const Node& first = node_by_internal_index(instance, i);
+        for (NodeIndex j = i + 1; j < size_; ++j) {
+            const Distance distance =
+                require_edge_distance(first, node_by_internal_index(instance, j));
+            values_[i * size_ + j] = distance;
+            values_[j * size_ + i] = distance;
+        }
+    }
 }
 
 Demand route_load(const Instance& instance, const Route& route) {
@@ -50,7 +86,8 @@ Distance route_distance(const Instance& instance, const Route& route) {
         const Node& current =
             node_by_internal_index(instance, route.stops[position]);
 
-        total_distance += euclidean_distance(previous, current);
+        total_distance = checked_sum(
+            total_distance, require_edge_distance(previous, current));
     }
 
     return total_distance;
@@ -60,7 +97,8 @@ Distance solution_distance(const Instance& instance, const Solution& solution) {
     Distance total_distance = 0;
 
     for (const Route& route : solution.routes) {
-        total_distance += route_distance(instance, route);
+        total_distance =
+            checked_sum(total_distance, route_distance(instance, route));
     }
 
     return total_distance;
