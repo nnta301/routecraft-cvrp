@@ -2,11 +2,11 @@
 
 ## Sprint 1
 
-Scaffold C++ build được, CLI help/version và smoke test đã có, nhưng Sprint 1 chưa hoàn thành. Sprint hoàn thành khi có mô hình dữ liệu, parser `.vrp`, NN, validator độc lập, CLI xuất TXT/JSON và tests. Validator phải tự tính lại tập khách, depot, tải, khoảng cách và tổng khoảng cách; không tin trực tiếp số liệu từ solver.
+Sprint 1 đã đóng. Đã có mô hình dữ liệu, parser `.vrp`, NN, validator độc lập, CLI và tests. CLI hiện hỗ trợ `routecraft --help` / `-h`, `routecraft --version` và `routecraft solve --input <file.vrp> --method nn --format json|txt`. Validator tự tính lại tập khách, depot, tải, khoảng cách và tổng khoảng cách; không tin trực tiếp số liệu từ solver. Chi tiết và các việc tồn đọng: [Sprint 1](sprints/sprint-01.md).
 
 ## Tiếp theo
 
-Thêm CW parallel, 2-opt và thực nghiệm đối chiếu. Điều kiện hoàn thành là mỗi cấu hình có thể chạy trên cùng input, xuất metadata đủ để đối chiếu và được validator kiểm tra.
+Sprint 2 đang lập kế hoạch, sau khi chốt hướng nghiên cứu với giảng viên hướng dẫn. Các hướng đã dự kiến trước đây: CW parallel, 2-opt và thực nghiệm đối chiếu. Điều kiện hoàn thành là mỗi cấu hình có thể chạy trên cùng input, xuất metadata đủ để đối chiếu và được validator kiểm tra.
 
 ## Sau đó
 

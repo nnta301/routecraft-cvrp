@@ -20,7 +20,7 @@ Solver C++ dùng chung lõi cho CLI và web. Các cấu hình nghiên cứu dự
 
 ## Trạng thái thực tế
 
-Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `--help`/`-h`/`--version`, smoke test CTest và workflow GitHub Actions.
+Repository có nền tảng C++17 build ngoài source tree: thư viện tĩnh `routecraft_core`, CLI `routecraft` với `routecraft --help`/`-h`, `routecraft --version` và `routecraft solve --input <file.vrp> --method nn --format json|txt`, smoke test CTest và workflow GitHub Actions.
 
 Lõi hiện đã có mô hình dữ liệu CVRP dùng chung, quy ước depot nội bộ `0`, lưu `original_id`, cùng tiện ích khoảng cách `EUC_2D`, tải tuyến, độ dài tuyến và tổng độ dài nghiệm. Parser `.vrp` hiện hỗ trợ một depot, `TYPE: CVRP` và `EDGE_WEIGHT_TYPE: EUC_2D`; parser kiểm tra dữ liệu đầu vào, chuẩn hóa depot về chỉ số nội bộ `0` và giữ ID nguồn.
 
@@ -30,7 +30,7 @@ Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. K�
 
 ## Trạng thái hiện tại
 
-Sprint hiện tại: [Sprint 1 — CVRP Baseline CLI](docs/sprints/sprint-01.md)
+Sprint 1 ([CVRP Baseline CLI](docs/sprints/sprint-01.md)) đã đóng. Sprint 2 đang lập kế hoạch; xem [lịch sử Sprint](docs/sprints/README.md). Quy ước nhánh và commit: [CONTRIBUTING.md](CONTRIBUTING.md) (nhánh dạng `<type>/<số-issue>-<mô-tả-ngắn>`).
 
 ## Build và kiểm tra
 
@@ -46,7 +46,7 @@ cmake --build build/Release
 ctest --test-dir build/Release --output-on-failure
 ```
 
-`configure` tạo cấu hình build, `build` biên dịch target, còn CTest chạy các test đã đăng ký. Dùng `Debug` cho phát triển/gỡ lỗi; `Release` là cấu hình dự kiến dùng cho thực nghiệm sau này. Với generator một cấu hình, executable nằm ở `build/<config>/bin/routecraft`; generator nhiều cấu hình thường thêm thư mục cấu hình bên dưới `bin`.
+`configure` tạo cấu hình build, `build` biên dịch target, còn CTest chạy các test đã đăng ký. Dùng `Debug` cho phát triển/gỡ lỗi; `Release` là cấu hình dự kiến dùng cho thực nghiệm sau này. Với generator một cấu hình, executable nằm ở `build/<config>/bin/<config>/routecraft` (`routecraft.exe` trên Windows), vì `RUNTIME_OUTPUT_DIRECTORY` được đặt là `bin/$<CONFIG>` với mọi generator.
 
 ## Chạy solver Sprint 1
 
@@ -57,7 +57,7 @@ Sau khi build, chạy pipeline parser → Nearest Neighbor → validator → xu�
 .\build\Debug\bin\Debug\routecraft.exe solve --input .\solver\tests\fixtures\cli-noncontiguous.vrp --method nn --format txt
 ```
 
-Ví dụ dùng đường dẫn executable của cấu hình Debug với Ninja trên Windows; chọn đường dẫn output tương ứng nếu dùng generator hoặc cấu hình khác. Sprint 1 chỉ hỗ trợ `--method nn` và định dạng `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
+Ví dụ dùng đường dẫn executable của cấu hình Debug trên Windows; đổi `Debug` thành cấu hình tương ứng nếu dùng cấu hình khác. Sprint 1 chỉ hỗ trợ `--method nn` và định dạng `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
 
 Các regression CTest của Sprint 1 dùng fixture nhỏ trong `solver/tests/fixtures/` và chạy luồng CLI thực tế cho JSON/TXT. Baseline chỉ có Nearest Neighbor, không giới hạn số xe `K`, không có pha cải thiện và không phải benchmark hoặc phép đo hiệu năng.
 
