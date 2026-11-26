@@ -39,7 +39,7 @@ def warnings(eff):
     out = []
     for r in eff.values():
         g, d = num(r, "gap_pct"), num(r, "vehicles_minus_k")
-        if g is not None and d is not None and g < 0 and d <= 0:
+        if g is not None and d is not None and g < 0 and d == 0:
             out.append(f"{r['set']}/{r['instance']} [{r['config']}]: gap={g} m-k={d:g}")
     return sorted(out)
 
@@ -62,7 +62,7 @@ def summarize(eff):
     text = "\n".join(lines) + "\n"
     w = warnings(eff)
     if w:
-        text += "\nCảnh báo: gap < 0 mà m-k <= 0 (nghi có lỗi):\n\n" + "\n".join("- " + x for x in w) + "\n"
+        text += "\nCảnh báo: gap < 0 mà m-k = 0 (mâu thuẫn với BKS tối ưu khi dùng đúng k xe, nghi có lỗi):\n\n" + "\n".join("- " + x for x in w) + "\n"
     return text
 
 

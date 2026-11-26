@@ -22,8 +22,8 @@ Giao thức này áp dụng cho mọi so sánh heuristic xây dựng trong hư�
 
 - `D`: tổng quãng đường. `m`: số tuyến.
 - Gap so với BKS: `gap_k = (D − BKS) / BKS × 100%`, BKS lấy từ `bks.csv` (với A, B, P đều là tối ưu đã chứng minh, ứng với `k` xe). Luôn báo kèm `m − k`.
-  - Gap âm khi `m > k` là hợp lệ, vì đề tài không giới hạn số xe.
-  - Gap âm khi `m ≤ k` là dấu hiệu lỗi (khoảng cách, parser hoặc validator) và phải điều tra trước khi dùng kết quả.
+  - BKS của CVRPLIB A, B, P là tối ưu khi dùng **đúng** k xe. Đề tài không giới hạn số xe, nên gap âm với `m ≠ k` là có thể. Ví dụ P-n55-k8: 7 xe là đủ (⌈1042/160⌉ = 7) và nghiệm 7 tuyến có chi phí 585 < BKS 588.
+  - Gap âm khi `m = k` mâu thuẫn với tính tối ưu của BKS, nên là dấu hiệu lỗi (khoảng cách, parser hoặc validator) và phải điều tra trước khi dùng kết quả.
 - So sánh giữa hai cấu hình A và B: chênh lệch tương đối theo từng instance, `Δ = (D_A − D_B) / D_B × 100%`. Hai nghiệm có cùng `D` (số nguyên) tính là hòa.
 - Thời gian: `timings_ms.construct` trong JSON của CLI, bản Release. Gồm dựng ma trận khoảng cách, tính điểm, sắp xếp và ghép; không gồm đọc file và khởi động tiến trình. Thời gian chỉ dùng để mô tả, báo trung vị.
 

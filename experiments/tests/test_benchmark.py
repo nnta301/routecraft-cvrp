@@ -95,5 +95,16 @@ class BenchmarkTest(unittest.TestCase):
         self.assertNotIn("A/i1 [", text)
 
 
+    def test_warning_only_when_m_equals_k(self):
+        def row(name, gap, d):
+            return {"set": "P", "instance": name, "config": "cw",
+                    "gap_pct": gap, "vehicles_minus_k": d}
+        eff = {1: row("same-k", "-0.5", "0"), 2: row("fewer", "-0.5", "-1"),
+               3: row("more", "-0.5", "1"), 4: row("positive", "2", "0")}
+        w = sm.warnings(eff)
+        self.assertEqual(len(w), 1)
+        self.assertIn("P/same-k", w[0])
+
+
 if __name__ == "__main__":
     unittest.main()
