@@ -12,6 +12,8 @@ Parser `.vrp` dự kiến chuyển dữ liệu nguồn sang quy ước này và 
 
 ## Output
 
+`method` là `nn` hoặc `cw`. Khi `method` là `cw` (Clarke–Wright parallel), JSON có thêm object `parameters` gồm `lambda`, `mu`, `nu` là số hữu hạn (mặc định 1, 0, 0, tương đương savings gốc), ví dụ `"parameters": {"lambda": 1, "mu": 0, "nu": 0}`; với `nn` không có `parameters`. Output TXT của `cw` có thêm dòng `Parameters: lambda=..., mu=..., nu=...` sau dòng `Method`.
+
 Output JSON có `routes`, `route_loads`, `route_distances`, `total_distance`, `num_routes`, `feasible`, `instance`, `method`, `timings_ms` và `node_ids`. `routes` dùng **chỉ số nội bộ** và luôn chứa `0` đầu/cuối; `node_ids` là mảng object có `internal_index` và `original_id` để khôi phục ID nguồn. Ví dụ minh họa:
 
 ```json

@@ -76,3 +76,14 @@ add_test(
     NAME routecraft_result_export_tests
     COMMAND routecraft_result_export_tests
 )
+
+add_executable(routecraft_clarke_wright_tests
+    clarke_wright_tests.cpp
+)
+
+target_link_libraries(routecraft_clarke_wright_tests PRIVATE routecraft_core)
+
+add_test(
+    NAME routecraft_clarke_wright_tests
+    COMMAND routecraft_clarke_wright_tests "${CMAKE_CURRENT_SOURCE_DIR}/fixtures"
+)

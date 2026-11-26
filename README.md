@@ -57,7 +57,7 @@ Sau khi build, chạy pipeline parser → Nearest Neighbor → validator → xu�
 .\build\Debug\bin\Debug\routecraft.exe solve --input .\solver\tests\fixtures\cli-noncontiguous.vrp --method nn --format txt
 ```
 
-Ví dụ dùng đường dẫn executable của cấu hình Debug trên Windows; đổi `Debug` thành cấu hình tương ứng nếu dùng cấu hình khác. Sprint 1 chỉ hỗ trợ `--method nn` và định dạng `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
+Ví dụ dùng đường dẫn executable của cấu hình Debug trên Windows; đổi `Debug` thành cấu hình tương ứng nếu dùng cấu hình khác. `--method` nhận `nn` hoặc `cw` (Clarke–Wright parallel); với `cw` có thể thêm `--lambda L --mu M --nu N` (mặc định 1, 0, 0, tương đương savings gốc), dùng các tham số này với `nn` sẽ báo lỗi cú pháp (mã 2). Định dạng nhận `json` hoặc `txt`. JSON dùng chỉ số nội bộ trong `routes`, đồng thời có `node_ids` để khôi phục ID nguồn; TXT hiển thị ID nguồn, tải và quãng đường từng tuyến. Dữ liệu kết quả chỉ được ghi ra stdout sau khi validator xác nhận nghiệm; lỗi được ghi ra stderr.
 
 Các regression CTest của Sprint 1 dùng fixture nhỏ trong `solver/tests/fixtures/` và chạy luồng CLI thực tế cho JSON/TXT. Baseline chỉ có Nearest Neighbor, không giới hạn số xe `K`, không có pha cải thiện và không phải benchmark hoặc phép đo hiệu năng.
 

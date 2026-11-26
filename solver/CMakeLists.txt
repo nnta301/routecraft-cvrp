@@ -1,4 +1,5 @@
 add_library(routecraft_core STATIC
+    src/clarke_wright.cpp
     src/cvrp.cpp
     src/distance.cpp
     src/nearest_neighbor.cpp
