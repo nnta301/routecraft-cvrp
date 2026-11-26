@@ -8,8 +8,9 @@ on:
     branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.head.repo.full_name || github.repository }}-${{ github.head_ref || github.ref_name }}
-  # Chỉ hủy lần chạy cũ trong PR; mọi commit trên main đều được chạy CI đầy đủ.
+  # PR: một group cho mỗi PR, commit mới hủy lần chạy cũ.
+  # Push lên main: một group cho mỗi commit, nên các commit không chờ hay hủy nhau.
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
