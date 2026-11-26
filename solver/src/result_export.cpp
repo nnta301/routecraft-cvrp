@@ -44,6 +44,13 @@ std::string escape_json(const std::string& value) {
     return output.str();
 }
 
+std::string format_number(double value) {
+    std::ostringstream output;
+    output.imbue(std::locale::classic());
+    output << std::setprecision(15) << value;
+    return output.str();
+}
+
 void write_timings(std::ostream& output, const SolutionTimings& timings) {
     output << std::fixed << std::setprecision(3)
            << "\"construct\": " << timings.construction_time_ms
@@ -57,13 +64,14 @@ std::string serialize_solution_json(
     const Instance& instance,
     const Solution& solution,
     const ValidationResult& validation,
-    const SolutionTimings& timings) {
+    const SolutionTimings& timings,
+    const SolutionMethod& method) {
     require_consistent_result(solution, validation);
     std::ostringstream output;
     output.imbue(std::locale::classic());
     output << "{\n"
            << "  \"instance\": \"" << escape_json(instance.name) << "\",\n"
-           << "  \"method\": \"nn\",\n"
+           << "  \"method\": \"" << escape_json(method.name) << "\",\n"
            << "  \"routes\": [";
     for (std::size_t route_index = 0; route_index < solution.routes.size(); ++route_index) {
         if (route_index != 0) output << ", ";
@@ -75,7 +83,13 @@ std::string serialize_solution_json(
         }
         output << "]";
     }
-    output << "],\n  \"route_loads\": [";
+    output << "],\n";
+    if (method.name == "cw") {
+        output << "  \"parameters\": {\"lambda\": " << format_number(method.lambda)
+               << ", \"mu\": " << format_number(method.mu)
+               << ", \"nu\": " << format_number(method.nu) << "},\n";
+    }
+    output << "  \"route_loads\": [";
     for (std::size_t index = 0; index < validation.route_loads.size(); ++index) {
         if (index != 0) output << ", ";
         output << validation.route_loads.at(index);
@@ -111,13 +125,19 @@ std::string serialize_solution_txt(
     const Instance& instance,
     const Solution& solution,
     const ValidationResult& validation,
-    const SolutionTimings& timings) {
+    const SolutionTimings& timings,
+    const SolutionMethod& method) {
     require_consistent_result(solution, validation);
     std::ostringstream output;
     output.imbue(std::locale::classic());
     output << "Instance: " << instance.name << "\n"
-           << "Method: nn\n"
-           << "Feasible: true\n";
+           << "Method: " << method.name << "\n";
+    if (method.name == "cw") {
+        output << "Parameters: lambda=" << format_number(method.lambda)
+               << ", mu=" << format_number(method.mu)
+               << ", nu=" << format_number(method.nu) << "\n";
+    }
+    output << "Feasible: true\n";
     for (std::size_t route_index = 0; route_index < solution.routes.size(); ++route_index) {
         output << "Route " << route_index + 1 << ": ";
         const Route& route = solution.routes.at(route_index);
