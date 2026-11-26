@@ -37,4 +37,38 @@ ClarkeWrightResult solve_clarke_wright_w1(
     const Instance& instance,
     const ClarkeWrightParameters& parameters);
 
+// Một trục của lưới: giá trị thứ k = start + k*step, k = 0..count-1,
+// count = llround((stop - start)/step) + 1.
+struct ParameterRange {
+    double start{};
+    double stop{};
+    double step{};
+};
+
+// Mặc định là lưới G của giao thức thực nghiệm: 20 x 21 x 21 = 8.820 bộ.
+struct ClarkeWrightGrid {
+    ParameterRange lambda{0.1, 2.0, 0.1};
+    ParameterRange mu{0.0, 2.0, 0.1};
+    ParameterRange nu{0.0, 2.0, 0.1};
+};
+
+struct ClarkeWrightGridResult {
+    Solution solution;
+    ClarkeWrightParameters best_parameters;
+    std::size_t configurations{};
+    Distance total_distance{};
+    double construction_time_ms{};
+};
+
+// Ném std::invalid_argument nếu lưới không hợp lệ (xem solve_clarke_wright_w1_grid).
+void validate_clarke_wright_grid(const ClarkeWrightGrid& grid);
+
+// Chạy W1 với mọi bộ trong lưới (lambda ngoài cùng, rồi mu, rồi nu; đều tăng dần).
+// Chọn quãng đường nhỏ nhất; hòa thì ít tuyến hơn; hòa nữa thì bộ đứng trước.
+// Ném std::invalid_argument nếu lưới không hợp lệ (step <= 0, không hữu hạn,
+// start > stop, hoặc quá 1.000.000 bộ).
+ClarkeWrightGridResult solve_clarke_wright_w1_grid(
+    const Instance& instance,
+    const ClarkeWrightGrid& grid = {});
+
 }

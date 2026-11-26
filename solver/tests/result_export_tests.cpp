@@ -48,6 +48,27 @@ void test_parameters_only_for_cw() {
     require(cw_txt.find("Parameters: lambda=1.5, mu=0, nu=2") != std::string::npos, "TXT cw phải có tham số");
 }
 
+void test_grid_export() {
+    const routecraft::Instance instance = make_instance();
+    const routecraft::Solution solution{{routecraft::Route{{0, 1, 0}}}};
+    const routecraft::ValidationResult validation = routecraft::validate_solution(instance, solution);
+    routecraft::SolutionMethod method{"cw-grid", 1.5, 0.0, 2.0};
+    method.grid = routecraft::ClarkeWrightGrid{};
+    method.configurations = 8820;
+    const std::string json = routecraft::serialize_solution_json(instance, solution, validation, {}, method);
+    require(json.find("\"method\": \"cw-grid\"") != std::string::npos, "JSON phải ghi method cw-grid");
+    require(json.find("\"parameters\": {\"lambda\": 1.5, \"mu\": 0, \"nu\": 2}") != std::string::npos,
+            "JSON cw-grid phải có parameters tốt nhất");
+    require(json.find("\"grid\": {\"lambda\": {\"start\": 0.1, \"stop\": 2, \"step\": 0.1}, "
+                      "\"mu\": {\"start\": 0, \"stop\": 2, \"step\": 0.1}, "
+                      "\"nu\": {\"start\": 0, \"stop\": 2, \"step\": 0.1}, \"configurations\": 8820}") !=
+                std::string::npos,
+            "JSON cw-grid phải có grid");
+    const std::string txt = routecraft::serialize_solution_txt(instance, solution, validation, {}, method);
+    require(txt.find("Parameters: lambda=1.5, mu=0, nu=2") != std::string::npos, "TXT cw-grid phải có tham số");
+    require(txt.find("Grid configurations: 8820") != std::string::npos, "TXT cw-grid phải có số bộ");
+}
+
 struct TestCase { const char* name; void (*run)(); };
 
 }
@@ -56,6 +77,7 @@ int main() {
     const std::vector<TestCase> test_cases{
         {"khong_xuat_nghiem_khong_kha_thi", test_infeasible_solution_cannot_be_serialized},
         {"tham_so_chi_cho_cw", test_parameters_only_for_cw},
+        {"xuat_cw_grid", test_grid_export},
     };
     int failed_tests = 0;
     for (const TestCase& test_case : test_cases) {

@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -17,7 +18,7 @@
 namespace {
 
 void print_help(std::ostream& stream) {
-    stream << "Cách dùng: routecraft [--help|-h|--version] | solve --input <file.vrp> --method nn|cw [--lambda L] [--mu M] [--nu N] --format json|txt\n"
+    stream << "Cách dùng: routecraft [--help|-h|--version] | solve --input <file.vrp> --method nn|cw|cw-grid [--lambda L] [--mu M] [--nu N] [--grid-lambda S:E:STEP] [--grid-mu S:E:STEP] [--grid-nu S:E:STEP] --format json|txt\n"
            << "\n"
            << "Lệnh:\n"
            << "  --help, -h   Hiển thị hướng dẫn này.\n"
@@ -25,6 +26,8 @@ void print_help(std::ostream& stream) {
            << "  solve        Đọc CVRP, chạy Nearest Neighbor (nn) hoặc Clarke–Wright parallel (cw) và xuất nghiệm.\n"
            << "\n"
            << "--lambda, --mu, --nu (mặc định 1, 0, 0) chỉ dùng với --method cw.\n"
+           << "cw-grid chạy cả lưới W1 trong một tiến trình và xuất nghiệm tốt nhất; --grid-lambda, --grid-mu, --grid-nu\n"
+           << "(dạng START:STOP:STEP, mặc định 0.1:2:0.1, 0:2:0.1, 0:2:0.1) chỉ dùng với --method cw-grid.\n"
            << "--format nhận json hoặc txt.\n";
 }
 
@@ -33,6 +36,17 @@ bool parse_finite(const std::string& text, double& value) {
     char* end = nullptr;
     value = std::strtod(text.c_str(), &end);
     return end == text.c_str() + text.size() && std::isfinite(value);
+}
+
+// START:STOP:STEP, ba số hữu hạn.
+bool parse_range(const std::string& text, routecraft::ParameterRange& range) {
+    const std::size_t first = text.find(':');
+    if (first == std::string::npos) return false;
+    const std::size_t second = text.find(':', first + 1);
+    if (second == std::string::npos || text.find(':', second + 1) != std::string::npos) return false;
+    return parse_finite(text.substr(0, first), range.start) &&
+           parse_finite(text.substr(first + 1, second - first - 1), range.stop) &&
+           parse_finite(text.substr(second + 1), range.step);
 }
 
 int usage_error(std::string_view message) {
@@ -52,6 +66,10 @@ int solve(int argc, char* argv[]) {
     bool lambda_seen = false;
     bool mu_seen = false;
     bool nu_seen = false;
+    routecraft::ClarkeWrightGrid grid;
+    bool grid_lambda_seen = false;
+    bool grid_mu_seen = false;
+    bool grid_nu_seen = false;
     for (int index = 2; index < argc; index += 2) {
         if (index + 1 >= argc) return usage_error("Thiếu giá trị cho tham số");
         const std::string_view option{argv[index]};
@@ -65,6 +83,16 @@ int solve(int argc, char* argv[]) {
         } else if (option == "--format" && !format_seen) {
             format_seen = true;
             format = value;
+        } else if ((option == "--grid-lambda" && !grid_lambda_seen) ||
+                   (option == "--grid-mu" && !grid_mu_seen) ||
+                   (option == "--grid-nu" && !grid_nu_seen)) {
+            routecraft::ParameterRange range;
+            if (!parse_range(value, range)) {
+                return usage_error("Giá trị của " + std::string(option) + " phải có dạng START:STOP:STEP (số hữu hạn)");
+            }
+            if (option == "--grid-lambda") { grid_lambda_seen = true; grid.lambda = range; }
+            else if (option == "--grid-mu") { grid_mu_seen = true; grid.mu = range; }
+            else { grid_nu_seen = true; grid.nu = range; }
         } else if ((option == "--lambda" && !lambda_seen) ||
                    (option == "--mu" && !mu_seen) ||
                    (option == "--nu" && !nu_seen)) {
@@ -82,9 +110,21 @@ int solve(int argc, char* argv[]) {
         input_path.empty() || method.empty() || format.empty()) {
         return usage_error("solve yêu cầu --input, --method và --format");
     }
-    if (method != "nn" && method != "cw") return usage_error("--method chỉ nhận nn hoặc cw");
-    if (method == "nn" && (lambda_seen || mu_seen || nu_seen)) {
+    if (method != "nn" && method != "cw" && method != "cw-grid") {
+        return usage_error("--method chỉ nhận nn, cw hoặc cw-grid");
+    }
+    if (method != "cw" && (lambda_seen || mu_seen || nu_seen)) {
         return usage_error("--lambda, --mu, --nu chỉ dùng với --method cw");
+    }
+    if (method != "cw-grid" && (grid_lambda_seen || grid_mu_seen || grid_nu_seen)) {
+        return usage_error("--grid-lambda, --grid-mu, --grid-nu chỉ dùng với --method cw-grid");
+    }
+    if (method == "cw-grid") {
+        try {
+            routecraft::validate_clarke_wright_grid(grid);
+        } catch (const std::invalid_argument& exception) {
+            return usage_error(exception.what());
+        }
     }
     if (format != "json" && format != "txt") return usage_error("--format chỉ nhận json hoặc txt");
 
@@ -92,16 +132,25 @@ int solve(int argc, char* argv[]) {
         const routecraft::Instance instance = routecraft::parse_cvrplib_file(input_path);
         routecraft::Solution solution;
         double construction_time_ms = 0.0;
+        routecraft::SolutionMethod solution_method{method, parameters.lambda, parameters.mu, parameters.nu};
         if (method == "cw") {
             routecraft::ClarkeWrightResult result = routecraft::solve_clarke_wright_w1(instance, parameters);
             solution = std::move(result.solution);
             construction_time_ms = result.construction_time_ms;
+        } else if (method == "cw-grid") {
+            routecraft::ClarkeWrightGridResult result = routecraft::solve_clarke_wright_w1_grid(instance, grid);
+            solution = std::move(result.solution);
+            construction_time_ms = result.construction_time_ms;
+            solution_method.lambda = result.best_parameters.lambda;
+            solution_method.mu = result.best_parameters.mu;
+            solution_method.nu = result.best_parameters.nu;
+            solution_method.grid = grid;
+            solution_method.configurations = result.configurations;
         } else {
             routecraft::NearestNeighborResult result = routecraft::solve_nearest_neighbor(instance);
             solution = std::move(result.solution);
             construction_time_ms = result.construction_time_ms;
         }
-        const routecraft::SolutionMethod solution_method{method, parameters.lambda, parameters.mu, parameters.nu};
         const auto validation_started = std::chrono::steady_clock::now();
         const routecraft::ValidationResult validation = routecraft::validate_solution(instance, solution);
         const auto validation_finished = std::chrono::steady_clock::now();

@@ -51,6 +51,15 @@ std::string format_number(double value) {
     return output.str();
 }
 
+bool has_parameters(const SolutionMethod& method) {
+    return method.name == "cw" || method.name == "cw-grid";
+}
+
+std::string format_range(const ParameterRange& range) {
+    return "{\"start\": " + format_number(range.start) + ", \"stop\": " + format_number(range.stop) +
+           ", \"step\": " + format_number(range.step) + "}";
+}
+
 void write_timings(std::ostream& output, const SolutionTimings& timings) {
     output << std::fixed << std::setprecision(3)
            << "\"construct\": " << timings.construction_time_ms
@@ -84,10 +93,16 @@ std::string serialize_solution_json(
         output << "]";
     }
     output << "],\n";
-    if (method.name == "cw") {
+    if (has_parameters(method)) {
         output << "  \"parameters\": {\"lambda\": " << format_number(method.lambda)
                << ", \"mu\": " << format_number(method.mu)
                << ", \"nu\": " << format_number(method.nu) << "},\n";
+    }
+    if (method.name == "cw-grid" && method.grid) {
+        output << "  \"grid\": {\"lambda\": " << format_range(method.grid->lambda)
+               << ", \"mu\": " << format_range(method.grid->mu)
+               << ", \"nu\": " << format_range(method.grid->nu)
+               << ", \"configurations\": " << method.configurations << "},\n";
     }
     output << "  \"route_loads\": [";
     for (std::size_t index = 0; index < validation.route_loads.size(); ++index) {
@@ -132,10 +147,13 @@ std::string serialize_solution_txt(
     output.imbue(std::locale::classic());
     output << "Instance: " << instance.name << "\n"
            << "Method: " << method.name << "\n";
-    if (method.name == "cw") {
+    if (has_parameters(method)) {
         output << "Parameters: lambda=" << format_number(method.lambda)
                << ", mu=" << format_number(method.mu)
                << ", nu=" << format_number(method.nu) << "\n";
+    }
+    if (method.name == "cw-grid" && method.grid) {
+        output << "Grid configurations: " << method.configurations << "\n";
     }
     output << "Feasible: true\n";
     for (std::size_t route_index = 0; route_index < solution.routes.size(); ++route_index) {
