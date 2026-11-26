@@ -193,6 +193,23 @@ void test_edge_outside_distance_domain_is_rejected() {
     require(result.route_distances.at(0) == std::numeric_limits<Distance>::max(), "Cạnh vượt miền phải giữ tại biên");
 }
 
+void test_route_without_customers_is_rejected() {
+    const auto double_depot = routecraft::validate_solution(
+        make_instance(), Solution{{Route{{0, 0}}, Route{{0, 1, 2, 0}}}});
+    require(!double_depot.feasible, "Tuyến [0, 0] phải không khả thi");
+    require(has_error_containing(double_depot, "Tuyến 1 không phục vụ khách nào"), "Phải báo tuyến không có khách");
+
+    const auto single_depot = routecraft::validate_solution(
+        make_instance(), Solution{{Route{{0}}, Route{{0, 1, 2, 0}}}});
+    require(!single_depot.feasible, "Tuyến [0] phải không khả thi");
+    require(has_error_containing(single_depot, "Tuyến 1 không phục vụ khách nào"), "Phải báo tuyến [0]");
+
+    const auto valid_plus_empty = routecraft::validate_solution(
+        make_instance(), Solution{{Route{{0, 1, 2, 0}}, Route{{0, 0}}}});
+    require(!valid_plus_empty.feasible, "Nghiệm hợp lệ thêm tuyến [0, 0] phải không khả thi");
+    require(has_error_containing(valid_plus_empty, "Tuyến 2 không phục vụ khách nào"), "Phải báo tuyến thêm");
+}
+
 struct TestCase {
     const char* name;
     void (*run)();
@@ -209,6 +226,7 @@ int main() {
         {"nghiem_hop_le_tinh_lai_so_lieu", test_valid_solution_recalculates_metrics_and_ignores_reported_route_metrics},
         {"depot_dau_cuoi", test_route_must_start_and_end_at_depot},
         {"depot_o_giua", test_depot_in_middle_is_rejected},
+        {"tuyen_khong_co_khach", test_route_without_customers_is_rejected},
         {"chi_so_khach_khong_hop_le", test_invalid_customer_index_does_not_access_out_of_range},
         {"khach_thieu_va_trung", test_missing_and_duplicate_customers_are_rejected},
         {"vuot_tai", test_over_capacity_is_rejected},
