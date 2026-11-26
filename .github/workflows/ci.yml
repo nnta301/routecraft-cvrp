@@ -35,6 +35,9 @@ jobs:
           cmake --version
           c++ --version
 
+      - name: Test experiment scripts
+        run: python3 -m unittest discover -s experiments/tests -v
+
       - name: Configure
         run: cmake -S . -B build/${{ matrix.build_type }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DBUILD_TESTING=ON
 
