@@ -37,3 +37,24 @@
   #25 CI Windows/sanitizer, #26 giao thức thực nghiệm.
 - Thứ tự merge: #17, #18, #19, #20 (không phụ thuộc nhau) → #27 (liên kết tới báo cáo review và các issue sửa lỗi).
 - Bước tiếp theo: đọc kết quả phản biện tính mới, chọn biến thể, soạn đề cương trình giảng viên, rồi lập kế hoạch Sprint 2.
+
+## 2026-11-26 — Sửa CI trên `main`
+
+- Merge #28–#32 liên tiếp làm CI của 4 commit trung gian bị hủy: mọi lần push lên `main` chung một concurrency group.
+  Đã chạy lại cả 4 lần, đều đạt.
+- #33 (PR #34): group theo số PR với `pull_request`, theo SHA với push lên `main`; chỉ hủy lần chạy cũ trong PR.
+
+## 2026-11-26 — Kết quả phản biện tính mới
+
+- Kết quả: `docs/research/novelty-review-learned-cw.md` (brief: `brief-novelty-learned-cw.md`).
+- Không tuyên bố ý tưởng là mới: Legrand et al. 2021 trùng gần như hoàn toàn ở mức ý tưởng.
+- Điểm mấu chốt: savings có tham số đã là hàm tuyến tính của chính các đặc trưng định dùng. Vì vậy phép thử trung tâm
+  là so với savings tham số được tune trực tiếp, không phải với CW gốc.
+- Khuyến nghị V1: giữ CW parallel, chỉ đổi điểm xếp thứ tự, so W0 savings gốc, W1 lưới (λ, μ, ν), W2 tune trực tiếp
+  trên quãng đường, W3 logistic regression trên nhãn cạnh, W4 gradient boosting nông. Đóng góp là một đánh giá có kiểm soát;
+  kết quả âm vẫn có giá trị. Tiêu chí thành công và cổng dừng ở mục 3 của file, phải chốt trước khi chạy A/B/P.
+- Mở rộng: V2 (CW ngẫu nhiên hóa theo điểm học được) sau V1; V3 (VRPTW) cho Project 2; V4 (bắt chước pilot method) cho Project 2 hoặc đồ án.
+- Cần cân nhắc: V1 là đánh giá có kiểm soát, không phải "thuật toán mới"; cần hỏi giảng viên có đáp ứng yêu cầu không.
+  Khối lượng ước tính 10–12 tuần, có thể nặng với Project 1.
+- Còn thiếu: đọc toàn văn Legrand et al. 2021 (HAL hal-03472209) trước khi trình bày.
+- Bước tiếp theo: trao đổi hướng với giảng viên, soạn đề cương ngắn, rồi lập kế hoạch Sprint 2.
