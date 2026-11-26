@@ -49,6 +49,23 @@ logic trở lên: Windows dùng `SetProcessAffinityMask`, Linux dùng
 `os.sched_setaffinity`; tiến trình con kế thừa. Nơi khác chỉ in cảnh báo.
 Tắt bằng `--no-pin`.
 
+## Môi trường Python cho học máy
+
+Các script thực nghiệm và unittest hiện có chỉ cần thư viện chuẩn. Phần học máy
+(PyVRP, numpy, scikit-learn) dùng venv riêng ở gốc repo (`.venv`, đã bị ignore):
+
+```
+python -m venv .venv
+.venv/Scripts/python.exe -m pip install -r experiments/requirements.txt   # Linux: .venv/bin/python
+```
+
+Smoke test PyVRP (đọc `.vrp` làm tròn từng cạnh, số xe không giới hạn, so chi
+phí PyVRP với chi phí tính lại độc lập, kiểm tra nghiệm hợp lệ):
+
+```
+.venv/Scripts/python.exe experiments/tools/pyvrp_smoke.py data/benchmarks/cvrplib/A/A-n32-k5.vrp --seconds 5 --seed 1
+```
+
 ## Lưu kết quả
 
 - Kết quả tạm: `runtime-output/experiments/` (không commit).
