@@ -38,6 +38,6 @@ cmake --build build/Release
 ctest --test-dir build/Release --output-on-failure
 ```
 
-`configure` tạo cấu hình build, `build` biên dịch, CTest chạy test đã đăng ký. `Debug` dành cho phát triển/gỡ lỗi; `Release` dự kiến phục vụ thực nghiệm sau này. Có thể kiểm tra CLI tại `build/Debug/bin/routecraft` với generator một cấu hình; generator nhiều cấu hình thêm thư mục cấu hình dưới `bin`.
+`configure` tạo cấu hình build, `build` biên dịch, CTest chạy test đã đăng ký. `Debug` dành cho phát triển/gỡ lỗi; `Release` dự kiến phục vụ thực nghiệm sau này. Có thể kiểm tra CLI tại `build/<cfg>/bin/<cfg>/routecraft` (`routecraft.exe` trên Windows), vì `RUNTIME_OUTPUT_DIRECTORY` được đặt là `bin/$<CONFIG>` với mọi generator. Quy ước nhánh và commit xem [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 Môi trường cục bộ đã kiểm tra ở bước scaffold này là Windows với CMake 3.31.5 và MinGW g++; chưa khẳng định hỗ trợ mọi OS/compiler. Backend/frontend/Docker chưa được cài đặt hay kiểm thử. Tham khảo: [CMake](https://cmake.org/documentation/), [Python venv](https://docs.python.org/3/library/venv.html), [Node.js](https://nodejs.org/en/download), [Docker](https://docs.docker.com/).
