@@ -90,3 +90,8 @@
 - Phát hiện: P-n55-k8 cho 585 < BKS 588 với 7 tuyến (k = 8). Đã kiểm chứng: 7 xe là đủ (⌈1042/160⌉ = 7), nghiệm hợp lệ, chi phí tính lại đúng;
   nghiệm BKS dùng đúng 8 tuyến. Kết luận: BKS của CVRPLIB A/B/P là tối ưu với đúng k xe. Quy tắc trong giao thức "gap âm khi m ≤ k là lỗi"
   sai; phải là "khi m = k". Sửa ở issue riêng, không cần chạy lại.
+
+## 2026-11-26 — Đóng Sprint 2
+
+- Sprint 2 đạt mọi tiêu chí; tổng kết ở `docs/sprints/sprint-02.md`.
+- Bước tiếp theo: lập Sprint 3 (bộ sinh instance kiểu X, gán nhãn bằng PyVRP, đặc trưng, W2, W4, SubLists, cổng dừng 1).

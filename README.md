@@ -30,7 +30,7 @@ Workflow `Build and test` kiểm tra cả cấu hình `Debug` và `Release`. K�
 
 ## Trạng thái hiện tại
 
-Sprint hiện tại: [Sprint 2 — Hạ tầng thực nghiệm](docs/sprints/sprint-02.md). Sprint 1 ([CVRP Baseline CLI](docs/sprints/sprint-01.md)) đã đóng; xem [lịch sử Sprint](docs/sprints/README.md). Quy ước nhánh và commit: [CONTRIBUTING.md](CONTRIBUTING.md) (nhánh dạng `<type>/<số-issue>-<mô-tả-ngắn>`).
+Sprint 2 ([Hạ tầng thực nghiệm](docs/sprints/sprint-02.md)) đã đóng; Sprint 3 đang lập kế hoạch. Sprint 1 ([CVRP Baseline CLI](docs/sprints/sprint-01.md)) đã đóng; xem [lịch sử Sprint](docs/sprints/README.md). Quy ước nhánh và commit: [CONTRIBUTING.md](CONTRIBUTING.md) (nhánh dạng `<type>/<số-issue>-<mô-tả-ngắn>`).
 
 ## Build và kiểm tra
 
