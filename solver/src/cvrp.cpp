@@ -7,6 +7,12 @@ namespace routecraft {
 const Node& node_by_internal_index(
     const Instance& instance,
     NodeIndex internal_index) {
+    // Đường nhanh O(1) khi node nằm đúng vị trí (parser luôn đánh chỉ số liên tục).
+    if (internal_index < instance.nodes.size() &&
+        instance.nodes[internal_index].internal_index == internal_index) {
+        return instance.nodes[internal_index];
+    }
+
     const Node* result = nullptr;
 
     for (const Node& node : instance.nodes) {
