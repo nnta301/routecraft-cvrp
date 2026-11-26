@@ -79,3 +79,14 @@
   CW tốt hơn NN trên 73/73 instance (trung vị Δ −24,0%). m − k trung bình: CW 0,34, NN 0,08.
 - Không có gap âm khi m ≤ k; mọi nghiệm qua validator; resume xác nhận không chạy lại ca đã có.
 - Bước tiếp theo: chế độ chạy lưới W1 trong một tiến trình (W1-grid), rồi lập Sprint 3 (sinh instance kiểu X, gán nhãn bằng PyVRP, huấn luyện W4, tune W2, SubLists).
+
+## 2026-11-26 — Kết quả W1-grid; BKS của A/B/P dùng đúng k xe
+
+- Kết quả: `experiments/results/w1-grid.md` (CSV cùng tên), commit `0ae2022`.
+- Gap trung bình / trung vị: W1-grid 2,00% / 2,16%; W0 5,42% / 5,23%; NN 38,05% / 37,81%.
+  W1-grid tốt hơn W0 trên 72/73 instance, hòa 1 (trung vị Δ −2,47%). Thời gian trung vị của W1-grid: 459 ms mỗi instance cho 8.820 bộ.
+- Bộ tham số tốt nhất rất phân tán: không bộ nào thắng quá 2 instance (λ hay gặp nhất là 1,3; μ = 0 ở 20/73; ν = 0 ở 29/73).
+  Vì vậy một bộ tham số cố định (W2) có thể kém xa W1-grid; đây là mức chuẩn W4 phải tiến gần theo tiêu chí 2 của giao thức.
+- Phát hiện: P-n55-k8 cho 585 < BKS 588 với 7 tuyến (k = 8). Đã kiểm chứng: 7 xe là đủ (⌈1042/160⌉ = 7), nghiệm hợp lệ, chi phí tính lại đúng;
+  nghiệm BKS dùng đúng 8 tuyến. Kết luận: BKS của CVRPLIB A/B/P là tối ưu với đúng k xe. Quy tắc trong giao thức "gap âm khi m ≤ k là lỗi"
+  sai; phải là "khi m = k". Sửa ở issue riêng, không cần chạy lại.
