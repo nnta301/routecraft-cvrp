@@ -25,6 +25,12 @@ else()
     target_compile_options(routecraft_core PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
+# MinGW: link tĩnh libgcc/libstdc++ để exe không nạp nhầm DLL runtime
+# khác phiên bản trong PATH (vd. /mingw64/bin của Git for Windows).
+if(MINGW)
+    target_link_options(routecraft_core INTERFACE -static-libgcc -static-libstdc++)
+endif()
+
 add_executable(routecraft
     cli/main.cpp
 )
