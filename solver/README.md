@@ -6,7 +6,7 @@ Lõi cũng cung cấp tiện ích tính khoảng cách `EUC_2D`, tải tuyến, 
 
 ## CLI `solve`
 
-Lệnh `routecraft solve --input <file.vrp> --method nn --format json|txt` thực hiện parser, Nearest Neighbor, validator và xuất kết quả ra stdout. `--method` nhận `nn` hoặc `cw` (Clarke–Wright parallel với savings tham số; thêm `--lambda`, `--mu`, `--nu`, mặc định 1, 0, 0, chỉ dùng với `cw`). JSON dùng chỉ số nội bộ trong route và có `node_ids` để ánh xạ về ID nguồn; TXT hiển thị ID nguồn cùng tải và khoảng cách từng tuyến. Lỗi và chẩn đoán được ghi ra stderr; CLI chỉ xuất kết quả khi validator xác nhận nghiệm khả thi.
+Lệnh `routecraft solve --input <file.vrp> --method nn --format json|txt` thực hiện parser, Nearest Neighbor, validator và xuất kết quả ra stdout. `--method` nhận `nn` hoặc `cw` (Clarke–Wright parallel với savings tham số; thêm `--lambda`, `--mu`, `--nu`, mặc định 1, 0, 0, chỉ dùng với `cw`) hoặc `cw-grid` (chạy cả lưới W1 trong một tiến trình, xuất nghiệm tốt nhất; đổi lưới bằng `--grid-lambda`, `--grid-mu`, `--grid-nu` dạng `START:STOP:STEP`, mặc định lưới G 8.820 bộ). JSON dùng chỉ số nội bộ trong route và có `node_ids` để ánh xạ về ID nguồn; TXT hiển thị ID nguồn cùng tải và khoảng cách từng tuyến. Lỗi và chẩn đoán được ghi ra stderr; CLI chỉ xuất kết quả khi validator xác nhận nghiệm khả thi.
 
 ## Validator độc lập
 

@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstddef>
 #include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -13,6 +15,8 @@ namespace routecraft {
 namespace {
 
 using Clock = std::chrono::steady_clock;
+
+constexpr std::size_t kMaxGridConfigurations = 1000000;
 
 struct Candidate {
     NodeIndex first{};
@@ -31,34 +35,17 @@ void require_valid_instance(const Instance& instance) {
     }
 }
 
-ClarkeWrightResult build_routes(
-    const Instance& instance,
-    const DistanceMatrix& distances,
-    const PairScore& score,
-    Clock::time_point started_at) {
+// Điểm giảm dần; hòa thì i tăng dần, rồi j tăng dần.
+bool candidate_before(const Candidate& a, const Candidate& b) {
+    if (a.score != b.score) return a.score > b.score;
+    if (a.first != b.first) return a.first < b.first;
+    return a.second < b.second;
+}
+
+// Thủ tục ghép duy nhất của mọi biến thể Clarke-Wright: duyệt `candidates`
+// (đã sắp) một lượt, ghép đầu mút hai tuyến khác nhau nếu không vượt tải.
+Solution merge_routes(const Instance& instance, const std::vector<Candidate>& candidates) {
     const std::size_t node_count = instance.nodes.size();
-
-    std::vector<Candidate> candidates;
-    for (NodeIndex i = 1; i < node_count; ++i) {
-        for (NodeIndex j = i + 1; j < node_count; ++j) {
-            const Distance savings = distances(0, i) + distances(0, j) - distances(i, j);
-            if (savings <= 0) {
-                continue;  // savings thật không dương: không bao giờ ghép
-            }
-            const double value = score(i, j);
-            if (!std::isfinite(value)) {
-                throw std::invalid_argument("Điểm của cặp khách phải là số hữu hạn");
-            }
-            candidates.push_back(Candidate{i, j, value});
-        }
-    }
-
-    // Điểm giảm dần; hòa thì i tăng dần, rồi j tăng dần.
-    std::sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b) {
-        if (a.score != b.score) return a.score > b.score;
-        if (a.first != b.first) return a.first < b.first;
-        return a.second < b.second;
-    });
 
     // Mỗi tuyến là danh sách khách (không gồm depot); route_of[c] là chỉ số tuyến.
     std::vector<std::vector<NodeIndex>> routes(node_count);
@@ -113,8 +100,77 @@ ClarkeWrightResult build_routes(
         solution.routes.push_back(std::move(route));
     }
 
+    return solution;
+}
+
+ClarkeWrightResult build_routes(
+    const Instance& instance,
+    const DistanceMatrix& distances,
+    const PairScore& score,
+    Clock::time_point started_at) {
+    const std::size_t node_count = instance.nodes.size();
+
+    std::vector<Candidate> candidates;
+    for (NodeIndex i = 1; i < node_count; ++i) {
+        for (NodeIndex j = i + 1; j < node_count; ++j) {
+            const Distance savings = distances(0, i) + distances(0, j) - distances(i, j);
+            if (savings <= 0) {
+                continue;  // savings thật không dương: không bao giờ ghép
+            }
+            const double value = score(i, j);
+            if (!std::isfinite(value)) {
+                throw std::invalid_argument("Điểm của cặp khách phải là số hữu hạn");
+            }
+            candidates.push_back(Candidate{i, j, value});
+        }
+    }
+    std::sort(candidates.begin(), candidates.end(), candidate_before);
+
+    Solution solution = merge_routes(instance, candidates);
     const std::chrono::duration<double, std::milli> elapsed = Clock::now() - started_at;
     return ClarkeWrightResult{std::move(solution), elapsed.count()};
+}
+
+double mean_customer_demand(const Instance& instance) {
+    double total_demand = 0.0;
+    for (NodeIndex c = 1; c < instance.nodes.size(); ++c) {
+        total_demand += static_cast<double>(node_by_internal_index(instance, c).demand);
+    }
+    const double customer_count = static_cast<double>(instance.nodes.size() - 1);
+    return customer_count > 0.0 ? total_demand / customer_count : 0.0;
+}
+
+// Công thức điểm W1 duy nhất, dùng chung cho W1 và lưới W1.
+double w1_score(
+    double d0i,
+    double d0j,
+    double dij,
+    double pair_demand,
+    double mean_demand,
+    const ClarkeWrightParameters& parameters) {
+    double value = d0i + d0j - parameters.lambda * dij + parameters.mu * std::fabs(d0i - d0j);
+    if (mean_demand > 0.0) {
+        value += parameters.nu * pair_demand / mean_demand;
+    }
+    return value;
+}
+
+// Giá trị thứ k của một trục lưới: start + k*step.
+std::size_t axis_count(const ParameterRange& range, const char* name) {
+    if (!std::isfinite(range.start) || !std::isfinite(range.stop) || !std::isfinite(range.step)) {
+        throw std::invalid_argument(std::string("Lưới ") + name + " có giá trị không hữu hạn");
+    }
+    if (range.step <= 0.0) {
+        throw std::invalid_argument(std::string("Bước của lưới ") + name + " phải dương");
+    }
+    if (range.start > range.stop) {
+        throw std::invalid_argument(std::string("Lưới ") + name + " có start lớn hơn stop");
+    }
+    const double steps = (range.stop - range.start) / range.step;
+    if (!std::isfinite(steps) || steps > static_cast<double>(kMaxGridConfigurations)) {
+        throw std::invalid_argument(std::string("Lưới ") + name + " có quá nhiều giá trị");
+    }
+    return static_cast<std::size_t>(std::llround(steps)) + 1;
 }
 
 }
@@ -150,26 +206,99 @@ ClarkeWrightResult solve_clarke_wright_w1(
     const auto started_at = Clock::now();
     const DistanceMatrix distances(instance);
 
-    double total_demand = 0.0;
-    for (NodeIndex c = 1; c < instance.nodes.size(); ++c) {
-        total_demand += static_cast<double>(node_by_internal_index(instance, c).demand);
-    }
-    const double customer_count = static_cast<double>(instance.nodes.size() - 1);
-    const double mean_demand = customer_count > 0.0 ? total_demand / customer_count : 0.0;
+    const double mean_demand = mean_customer_demand(instance);
 
     const PairScore score = [&](NodeIndex i, NodeIndex j) {
-        const double d0i = static_cast<double>(distances(0, i));
-        const double d0j = static_cast<double>(distances(0, j));
-        double value = d0i + d0j - parameters.lambda * static_cast<double>(distances(i, j)) +
-                       parameters.mu * std::fabs(d0i - d0j);
-        if (mean_demand > 0.0) {
-            const double pair_demand = static_cast<double>(
-                node_by_internal_index(instance, i).demand + node_by_internal_index(instance, j).demand);
-            value += parameters.nu * pair_demand / mean_demand;
-        }
-        return value;
+        const double pair_demand = static_cast<double>(
+            node_by_internal_index(instance, i).demand + node_by_internal_index(instance, j).demand);
+        return w1_score(
+            static_cast<double>(distances(0, i)), static_cast<double>(distances(0, j)),
+            static_cast<double>(distances(i, j)), pair_demand, mean_demand, parameters);
     };
     return build_routes(instance, distances, score, started_at);
+}
+
+void validate_clarke_wright_grid(const ClarkeWrightGrid& grid) {
+    const std::size_t lambda_count = axis_count(grid.lambda, "lambda");
+    const std::size_t mu_count = axis_count(grid.mu, "mu");
+    const std::size_t nu_count = axis_count(grid.nu, "nu");
+    if (lambda_count > kMaxGridConfigurations / mu_count ||
+        lambda_count * mu_count > kMaxGridConfigurations / nu_count) {
+        throw std::invalid_argument("Lưới có quá nhiều bộ tham số (tối đa 1.000.000)");
+    }
+}
+
+ClarkeWrightGridResult solve_clarke_wright_w1_grid(
+    const Instance& instance,
+    const ClarkeWrightGrid& grid) {
+    validate_clarke_wright_grid(grid);
+    const std::size_t lambda_count = axis_count(grid.lambda, "lambda");
+    const std::size_t mu_count = axis_count(grid.mu, "mu");
+    const std::size_t nu_count = axis_count(grid.nu, "nu");
+    require_valid_instance(instance);
+    const auto started_at = Clock::now();
+    const DistanceMatrix distances(instance);
+    const double mean_demand = mean_customer_demand(instance);
+
+    // Dữ liệu cặp dựng một lần, theo thứ tự (i, j) như build_routes.
+    struct PairData {
+        double d0i, d0j, dij, demand;
+    };
+    std::vector<PairData> pairs;
+    std::vector<Candidate> candidates;
+    const std::size_t node_count = instance.nodes.size();
+    for (NodeIndex i = 1; i < node_count; ++i) {
+        for (NodeIndex j = i + 1; j < node_count; ++j) {
+            if (distances(0, i) + distances(0, j) - distances(i, j) <= 0) continue;
+            pairs.push_back(PairData{
+                static_cast<double>(distances(0, i)), static_cast<double>(distances(0, j)),
+                static_cast<double>(distances(i, j)),
+                static_cast<double>(node_by_internal_index(instance, i).demand +
+                                    node_by_internal_index(instance, j).demand)});
+            candidates.push_back(Candidate{i, j, 0.0});
+        }
+    }
+    const std::vector<Candidate> original_order = candidates;
+
+    ClarkeWrightGridResult best;
+    Distance best_distance = 0;
+    std::size_t best_routes = 0;
+    std::size_t done = 0;
+    for (std::size_t a = 0; a < lambda_count; ++a) {
+        for (std::size_t b = 0; b < mu_count; ++b) {
+            for (std::size_t c = 0; c < nu_count; ++c) {
+                const ClarkeWrightParameters parameters{
+                    grid.lambda.start + static_cast<double>(a) * grid.lambda.step,
+                    grid.mu.start + static_cast<double>(b) * grid.mu.step,
+                    grid.nu.start + static_cast<double>(c) * grid.nu.step};
+                for (std::size_t p = 0; p < pairs.size(); ++p) {
+                    const double value = w1_score(
+                        pairs[p].d0i, pairs[p].d0j, pairs[p].dij, pairs[p].demand, mean_demand, parameters);
+                    if (!std::isfinite(value)) {
+                        throw std::invalid_argument("Điểm của cặp khách phải là số hữu hạn");
+                    }
+                    candidates[p] = original_order[p];
+                    candidates[p].score = value;
+                }
+                std::sort(candidates.begin(), candidates.end(), candidate_before);
+                Solution solution = merge_routes(instance, candidates);
+                const Distance total = solution_distance(instance, solution);
+                ++done;
+                if (done == 1 || total < best_distance ||
+                    (total == best_distance && solution.routes.size() < best_routes)) {
+                    best_distance = total;
+                    best_routes = solution.routes.size();
+                    best.solution = std::move(solution);
+                    best.best_parameters = parameters;
+                }
+            }
+        }
+    }
+    best.configurations = done;
+    best.total_distance = best_distance;
+    const std::chrono::duration<double, std::milli> elapsed = Clock::now() - started_at;
+    best.construction_time_ms = elapsed.count();
+    return best;
 }
 
 }

@@ -172,6 +172,98 @@ void test_fixtures_validate() {
     }
 }
 
+routecraft::ClarkeWrightGrid small_grid() {
+    routecraft::ClarkeWrightGrid grid;
+    grid.lambda = {0.5, 1.5, 0.5};
+    grid.mu = {0.0, 1.0, 0.5};
+    grid.nu = {0.0, 1.0, 0.5};
+    return grid;
+}
+
+void require_same_solution(const Solution& a, const Solution& b, const std::string& message) {
+    require(a.routes.size() == b.routes.size(), message + ": khác số tuyến");
+    for (std::size_t index = 0; index < a.routes.size(); ++index) {
+        require(a.routes[index].stops == b.routes[index].stops, message + ": khác tuyến " + std::to_string(index));
+    }
+}
+
+void test_grid_matches_w1() {
+    const std::vector<std::string> names{
+        "sprint1-full-capacity.vrp", "sprint1-noncontiguous-ids.vrp", "sprint1-toy.vrp"};
+    for (const std::string& name : names) {
+        const Instance instance = routecraft::parse_cvrplib_file(std::filesystem::path(fixture_dir) / name);
+        const routecraft::ClarkeWrightGridResult grid = routecraft::solve_clarke_wright_w1_grid(instance, small_grid());
+        require(grid.configurations == 27, name + ": lưới nhỏ phải có 27 bộ");
+        const routecraft::ClarkeWrightResult single =
+            routecraft::solve_clarke_wright_w1(instance, grid.best_parameters);
+        require_same_solution(grid.solution, single.solution, name + " lưới so với W1");
+        const routecraft::ValidationResult validation = routecraft::validate_solution(instance, single.solution);
+        require(validation.feasible && validation.total_distance == grid.total_distance,
+                name + ": quãng đường lưới phải khớp validator");
+        // Không bộ nào trong lưới tốt hơn nghiệm đã chọn.
+        const routecraft::ClarkeWrightGrid axes = small_grid();
+        for (double l = axes.lambda.start; l <= axes.lambda.stop; l += axes.lambda.step) {
+            for (double m = axes.mu.start; m <= axes.mu.stop; m += axes.mu.step) {
+                for (double n = axes.nu.start; n <= axes.nu.stop; n += axes.nu.step) {
+                    const Solution s = routecraft::solve_clarke_wright_w1(instance, {l, m, n}).solution;
+                    require(routecraft::validate_solution(instance, s).total_distance >= grid.total_distance,
+                            name + ": có bộ tốt hơn nghiệm lưới");
+                }
+            }
+        }
+    }
+}
+
+void test_single_point_grid_equals_w0() {
+    const Instance instance = routecraft::parse_cvrplib_file(
+        std::filesystem::path(fixture_dir) / "sprint1-toy.vrp");
+    routecraft::ClarkeWrightGrid grid;
+    grid.lambda = {1.0, 1.0, 0.1};
+    grid.mu = {0.0, 0.0, 0.1};
+    grid.nu = {0.0, 0.0, 0.1};
+    const routecraft::ClarkeWrightGridResult result = routecraft::solve_clarke_wright_w1_grid(instance, grid);
+    require(result.configurations == 1, "lưới một điểm phải có 1 bộ");
+    require_same_solution(result.solution, routecraft::solve_clarke_wright_w0(instance).solution, "lưới một điểm so với W0");
+}
+
+// Một khách: mọi bộ cho cùng nghiệm, nên phải chọn bộ đầu tiên của lưới.
+void test_grid_tie_picks_first() {
+    const Instance instance = make_instance(10, {{0, 0}, {3, 4}}, {0, 1});
+    const routecraft::ClarkeWrightGridResult result = routecraft::solve_clarke_wright_w1_grid(instance, small_grid());
+    require(result.best_parameters.lambda == 0.5 && result.best_parameters.mu == 0.0 &&
+                result.best_parameters.nu == 0.0,
+            "hòa phải chọn bộ đầu tiên");
+}
+
+void test_invalid_grids_rejected() {
+    const Instance instance = triangle_instance(10);
+    const double nan = std::numeric_limits<double>::quiet_NaN();
+    const double inf = std::numeric_limits<double>::infinity();
+    const std::vector<routecraft::ParameterRange> bad_ranges{
+        {0.0, 1.0, 0.0}, {0.0, 1.0, -0.1}, {nan, 1.0, 0.1}, {0.0, inf, 0.1}, {0.0, 1.0, nan},
+        {2.0, 1.0, 0.1}, {0.0, 1e9, 1.0}, {0.0, 1e300, 1e-300}};
+    for (const routecraft::ParameterRange& range : bad_ranges) {
+        for (int axis = 0; axis < 3; ++axis) {
+            routecraft::ClarkeWrightGrid grid = small_grid();
+            (axis == 0 ? grid.lambda : axis == 1 ? grid.mu : grid.nu) = range;
+            require(throws_invalid_argument([&] { routecraft::solve_clarke_wright_w1_grid(instance, grid); }),
+                    "lưới không hợp lệ phải bị từ chối");
+        }
+    }
+    // 101^3 = 1.030.301 > 1.000.000
+    routecraft::ClarkeWrightGrid big;
+    big.lambda = {0.0, 100.0, 1.0};
+    big.mu = {0.0, 100.0, 1.0};
+    big.nu = {0.0, 100.0, 1.0};
+    require(throws_invalid_argument([&] { routecraft::solve_clarke_wright_w1_grid(instance, big); }),
+            "lưới quá 1.000.000 bộ phải bị từ chối");
+}
+
+void test_default_grid_size() {
+    const Instance instance = triangle_instance(10);
+    require(routecraft::solve_clarke_wright_w1_grid(instance).configurations == 8820, "lưới mặc định phải có 8.820 bộ");
+}
+
 struct TestCase {
     const char* name;
     std::function<void()> run;
@@ -195,6 +287,11 @@ int main(int argc, char* argv[]) {
         {"tham_so_khong_huu_han_bi_tu_choi", test_non_finite_values_are_rejected},
         {"w1_mac_dinh_bang_w0", test_w1_defaults_match_w0},
         {"fixture_qua_validator", test_fixtures_validate},
+        {"luoi_trung_w1", test_grid_matches_w1},
+        {"luoi_mot_diem_bang_w0", test_single_point_grid_equals_w0},
+        {"luoi_hoa_chon_bo_dau", test_grid_tie_picks_first},
+        {"luoi_khong_hop_le", test_invalid_grids_rejected},
+        {"luoi_mac_dinh_8820_bo", test_default_grid_size},
     };
 
     int failed_tests = 0;
