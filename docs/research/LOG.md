@@ -71,3 +71,11 @@
 - Sprint 2 (`docs/sprints/sprint-02.md`): #23 ma trận khoảng cách, #38 dữ liệu CVRPLIB A/B/P (73 instance, BKS đều tối ưu, kiểm tra lại
   chi phí khớp), #39 script benchmark, #40 Clarke–Wright W0/W1, #41 kết quả baseline.
 - Bước tiếp theo: kết quả baseline NN và CW W0 trên A/B/P; chế độ chạy lưới W1 trong một tiến trình; lập Sprint 3.
+
+## 2026-11-26 — Kết quả baseline Nearest Neighbor và Clarke–Wright W0
+
+- Kết quả: `experiments/results/baseline-nn-cw.md` (CSV cùng tên), chạy trên commit `16b177b`, đúng giao thức.
+- Clarke–Wright W0: gap trung bình 5,42%, trung vị 5,23%. Nearest Neighbor: 38,05% / 37,81%.
+  CW tốt hơn NN trên 73/73 instance (trung vị Δ −24,0%). m − k trung bình: CW 0,34, NN 0,08.
+- Không có gap âm khi m ≤ k; mọi nghiệm qua validator; resume xác nhận không chạy lại ca đã có.
+- Bước tiếp theo: chế độ chạy lưới W1 trong một tiến trình (W1-grid), rồi lập Sprint 3 (sinh instance kiểu X, gán nhãn bằng PyVRP, huấn luyện W4, tune W2, SubLists).
